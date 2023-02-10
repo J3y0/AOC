@@ -45,7 +45,7 @@ fn parse(input: String) -> Map {
     }
 }
 
-fn find_neighbors(vertex: Point, my_map: &Map) -> Vec<Point> {
+fn find_neighbors(vertex: Point, my_map: &Map, part: u8) -> Vec<Point> {
     let num_columns = (*my_map).num_columns as isize;
     let num_rows = (*my_map).num_rows as isize;
     let current_row = vertex.0 as isize;
@@ -70,9 +70,15 @@ fn find_neighbors(vertex: Point, my_map: &Map) -> Vec<Point> {
         })
         .map(|(r, c)| (r as usize, c as usize))
         // Make sure you can access the next node
-        .filter(|(r, c)| {
-            my_map.map[current_row as usize][current_column as usize] + 1 >= my_map.map[*r][*c]
-        })
+            .filter(|(r, c)| match part {
+                1 => {
+                    my_map.map[current_row as usize][current_column as usize] + 1 >= my_map.map[*r][*c]
+                },
+                2 => {
+                    my_map.map[current_row as usize][current_column as usize].saturating_sub(1) <= my_map.map[*r][*c]
+                },
+                _ => false
+            })
         .collect()
 }
 
@@ -91,10 +97,10 @@ fn find_min_and_remove_former(
     nodes.remove(index)
 }
 
-fn dijkstra(my_map: Map) -> Option<u32> {
+fn dijkstra_part1(my_map: &Map) -> Option<u16> {
     /*
      * Using Dijkstra algorithm but we return only the distance, we don't need
-     * the shortest path here.
+     * the path here.
      */
 
     // Init
@@ -116,12 +122,12 @@ fn dijkstra(my_map: Map) -> Option<u32> {
 
     while !nodes.is_empty() {
         let current_node: Point = find_min_and_remove_former(&mut nodes, &distance, columns);
-        let neighbors: Vec<Point> = find_neighbors(current_node, &my_map);
+        let neighbors: Vec<Point> = find_neighbors(current_node, &my_map, 1);
         let current_distance: u16 = distance[current_node.0 * columns + current_node.1];
 
         // Testing if we accessed the last node
         if current_node == my_map.end {
-            return Some(current_distance as u32);
+            return Some(current_distance);
         }
 
         // Updating the next potential nodes' distance
@@ -134,11 +140,72 @@ fn dijkstra(my_map: Map) -> Option<u32> {
     return None;
 }
 
+fn dijkstra_part2(my_map: &Map) -> Option<u16> {
+    /*
+     * Using Dijkstra algorithm but we return only the distance, we don't need
+     * the path here.
+     */
+
+    // Init
+    let rows = my_map.num_rows;
+    let columns = my_map.num_columns;
+    let mut distance = vec![u16::MAX; rows * columns];
+    let mut nodes = Vec::with_capacity(rows * columns);
+
+    // Init nodes
+    for i in 0..rows {
+        for j in 0..columns {
+            nodes.push((i, j));
+        }
+    }
+
+    // Distance to the starting node from the starting node is 0
+    let current_node: Point = my_map.end;
+    distance[current_node.0 * columns + current_node.1] = 0;
+
+    while !nodes.is_empty() {
+        let current_node: Point = find_min_and_remove_former(&mut nodes, &distance, columns);
+        let neighbors: Vec<Point> = find_neighbors(current_node, &my_map, 2);
+        let current_distance: u16 = distance[current_node.0 * columns + current_node.1];
+
+        // Updating the next potential nodes' distance
+        for v in neighbors {
+            if distance[v.0 * columns + v.1] > current_distance.saturating_add(1) {
+                distance[v.0 * columns + v.1] = current_distance.saturating_add(1);
+            }
+        }
+    }
+
+    let mut possible: Vec<Point> = Vec::new();
+    for i in 0..my_map.map.len() {
+        for j in 0..my_map.map[0].len() {
+            if my_map.map[i][j] == 0 {
+                possible.push((i, j))
+            }
+        }
+    }
+    if possible.is_empty() {
+        return None;
+    }
+
+    let mut mini: u16 = u16::MAX;
+    for v in possible {
+        if distance[v.0 * columns + v.1] < mini {
+            mini = distance[v.0 * columns + v.1];
+        }
+    }
+
+    return Some(mini);
+}
+
 fn main() {
     let content: String =
         fs::read_to_string("./data/day12.txt").expect("Should have been able to read file");
 
     let my_map: Map = parse(content);
-    let part1: u32 = dijkstra(my_map).expect("Error while solving part 1");
+    let part1: u16 = dijkstra_part1(&my_map).expect("Error while solving part 1");
     println!("Part 1: {part1}");
+
+    let part2: u16 = dijkstra_part2(&my_map).expect("Error while solving part 1");
+    println!("Part 2: {part2}");
 }
