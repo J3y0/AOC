@@ -12,6 +12,12 @@ type Pairs struct {
 	Packet2 any `json:"array2"`
 }
 
+type IndexError struct {}
+
+func (ie *IndexError) Error() string {
+    return "Error while finding index"
+}
+
 func ParseInput(r io.ReaderAt) (input []Pairs, err error) {
 	// Read file
 	var data string
@@ -19,8 +25,8 @@ func ParseInput(r io.ReaderAt) (input []Pairs, err error) {
 	endFile := false
 	offset := 0
 	for !endFile {
-		n, err := r.ReadAt(buf, int64(offset))
-		if err == io.EOF {
+		n, errFile := r.ReadAt(buf, int64(offset))
+		if errFile == io.EOF {
 			endFile = true
 		}
 
@@ -129,7 +135,10 @@ func Part2(pairs []Pairs) (decoderKey int, err error) {
     var packets []any
     var temp any
     for i := 0;i < 2; i++ {
-        json.Unmarshal([]byte(dividerPackets[i]), &temp)
+        err = json.Unmarshal([]byte(dividerPackets[i]), &temp)
+        if err != nil {
+            return
+        }
         packets = append(packets, temp)
     }
 
@@ -140,20 +149,18 @@ func Part2(pairs []Pairs) (decoderKey int, err error) {
 
     // Sort the array with all packets
     sort.SliceStable(packets, func(i, j int) bool {
-        if ValidPairs(packets[i], packets[j]) < 0 {
-            return true
-        } else {
-            return false
-        }
+        return ValidPairs(packets[i], packets[j]) < 0
     })
 
     var err_index error
     dividerPacketsIndex[0], err_index = findDividerIndex(packets, dividerPackets[0])
     if err_index != nil {
+        err = &IndexError{}
         return
     }
     dividerPacketsIndex[1], err_index = findDividerIndex(packets, dividerPackets[1])
     if err_index != nil {
+        err = &IndexError{}
         return
     }
     decoderKey = dividerPacketsIndex[0] * dividerPacketsIndex[1]
