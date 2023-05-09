@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+    "time"
 
 	"day14/cave"
 )
@@ -13,20 +14,26 @@ func main() {
 		fmt.Printf("Error while opening file\n")
 	}
 
+    start := time.Now()
 	part1, err := solvePart1(file)
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		os.Exit(1)
 	}
+    timeTaken := time.Since(start)
 
 	fmt.Printf("Part 1: %d\n", part1)
+    fmt.Printf("Solved in: %v\n", timeTaken)
 
+    start = time.Now()
 	part2, err := solvePart2(file)
+    timeTaken = time.Since(start)
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		os.Exit(1)
 	}
 	fmt.Printf("Part2: %d\n", part2)
+    fmt.Printf("Solved in: %v\n", timeTaken)
 }
 
 func solvePart1(file *os.File) (res int, err error) {
@@ -34,7 +41,6 @@ func solvePart1(file *os.File) (res int, err error) {
 	if err != nil {
 		return
 	}
-	c.Pretty()
 
 	var again bool = true
 	fmt.Println("[~] The simulation is running ...")
@@ -44,7 +50,7 @@ func solvePart1(file *os.File) (res int, err error) {
 			res++
 		}
 	}
-	c.Pretty()
+	// c.Pretty()
 	return
 }
 
@@ -64,7 +70,6 @@ func solvePart2(file *os.File) (res int, err error) {
 	if err != nil {
 		return
 	}
-	c.Pretty()
 
 	var again bool = true
 	fmt.Println("[~] The simulation is running ...")
@@ -72,6 +77,6 @@ func solvePart2(file *os.File) (res int, err error) {
 		again = cave.StepSimulation2(c)
 		res++
 	}
-	c.Pretty()
+	// c.Pretty()
 	return
 }
