@@ -1,7 +1,7 @@
 Trying to solve each challenge of the 2022 edition of Advent of Code
 
 I might write solutions in different languages but most of them will be in rust.
-This is a great way to learn Rust and how to tackle AOC challenges !
+This is a great way to learn Rust and to improve your coding skills !
 
 Here are the references to them:
 
@@ -17,3 +17,5 @@ Here are the references to them:
 - [Day 10](./day10/src/main.rs)
 - [Day 11](./day11/day11.py)
 - [Day 12](./day12/src/main.rs)
+- [Day 13](./day13/main.go)
+- [Day 14](./day14/main.go)
