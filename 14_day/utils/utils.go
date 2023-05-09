@@ -19,7 +19,7 @@ func Max(a, b int) int {
 	return b
 }
 
-func FindMinAndMax(coords []Coords, minX, minY, maxX, maxY int) (int, int, int, int) {
+func UpdateMinAndMax(coords []Coords, minX, minY, maxX, maxY int) (int, int, int, int) {
 	for i := range coords {
 		x := coords[i].X
 		y := coords[i].Y

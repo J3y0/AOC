@@ -94,7 +94,7 @@ func ParseInput(r io.ReaderAt) (*Cave, error) {
 			}
 			lineCoords = append(lineCoords, utils.Coords{X: x, Y: y})
 		}
-		minX, minY, maxX, maxY = utils.FindMinAndMax(lineCoords, minX, minY, maxX, maxY)
+		minX, minY, maxX, maxY = utils.UpdateMinAndMax(lineCoords, minX, minY, maxX, maxY)
 		allCoords = append(allCoords, lineCoords)
 	}
 
