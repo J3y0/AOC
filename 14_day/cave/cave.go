@@ -11,7 +11,6 @@ import (
 )
 
 type Cave struct {
-	MinX     int
 	MinY     int
 	MaxX     int
 	MaxY     int
@@ -51,6 +50,26 @@ func (c *Cave) Fill(coords [][]utils.Coords) {
 	}
 }
 
+func (c *Cave) ExtendMapToLeft() {
+	length := len(c.CaveMap)
+	for i := 0; i < length-1; i++ {
+		c.CaveMap[i] = append([]string{""}, c.CaveMap[i]...)
+	}
+
+	// The last line is special
+	c.CaveMap[length-1] = append([]string{"#"}, c.CaveMap[length-1]...)
+	c.MinY -= 1
+}
+
+func (c *Cave) ExtendMapToRight() {
+	length := len(c.CaveMap)
+	for i := 0; i < length-1; i++ {
+		c.CaveMap[i] = append(c.CaveMap[i], "")
+	}
+	// The last line is special
+	c.CaveMap[length-1] = append(c.CaveMap[length-1], "#")
+}
+
 func ParseInput(r io.ReaderAt) (*Cave, error) {
 	// Read file
 	var input string
@@ -74,7 +93,6 @@ func ParseInput(r io.ReaderAt) (*Cave, error) {
 	lines = lines[:len(lines)-1]
 
 	allCoords := make([][]utils.Coords, 0, len(lines))
-	var minX int = 1000
 	var minY int = 1000
 	var maxX int = 0
 	var maxY int = 0
@@ -94,12 +112,11 @@ func ParseInput(r io.ReaderAt) (*Cave, error) {
 			}
 			lineCoords = append(lineCoords, utils.Coords{X: x, Y: y})
 		}
-		minX, minY, maxX, maxY = utils.UpdateMinAndMax(lineCoords, minX, minY, maxX, maxY)
+		minY, maxX, maxY = utils.UpdateMinAndMax(lineCoords, minY, maxX, maxY)
 		allCoords = append(allCoords, lineCoords)
 	}
 
 	c := &Cave{
-		MinX:     minX,
 		MinY:     minY,
 		MaxX:     maxX,
 		MaxY:     maxY,
