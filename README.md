@@ -11,7 +11,7 @@ Here are the references to them:
 - [Day 4](./04_day/src/main.rs)
 - [Day 5](./05_day/day5.py)
 - [Day 6](./06_day/src/App.java)
-- Day 7
+- [Day 7](./07_day/main.go)
 - [Day 8](./08_day/src/main.rs)
 - [Day 9](./09_day/src/main.rs)
 - [Day 10](./10_day/src/main.rs)
