@@ -1,7 +1,7 @@
 Trying to solve each challenge of the 2022 edition of Advent of Code
 
-I might write solutions in different languages but most of them will be in rust.
-This is a great way to learn Rust and to improve your coding skills !
+I might write solutions in different languages but most of them will be in rust or golang.
+This is a great way to learn languages and to improve your coding skills !
 
 Here are the references to them:
 
@@ -19,3 +19,4 @@ Here are the references to them:
 - [Day 12](./12_day/src/main.rs)
 - [Day 13](./13_day/main.go)
 - [Day 14](./14_day/main.go)
+- [Day 15](./15_day/main.go)
