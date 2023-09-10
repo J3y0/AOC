@@ -103,79 +103,79 @@ func ComputeLength(lines []Line) int {
 }
 
 func coefCurves(sx1, sy1, sx2, sy2, r1, r2 int) (int, int, int, int) {
-    // Curves of the form x+a or -x+b forming the bounds of the diamond
-    a1 := -(sx1 + r1) + sy1
-    a3 := -(sx1 - r1) + sy1
-    b2 := sx2 + sy2 - r2
-    b4 := sx2 + sy2 + r2
-    return a1, a3, b2, b4
+	// Curves of the form x+a or -x+b forming the bounds of the diamond
+	a1 := -(sx1 + r1) + sy1
+	a3 := -(sx1 - r1) + sy1
+	b2 := sx2 + sy2 - r2
+	b4 := sx2 + sy2 + r2
+	return a1, a3, b2, b4
 }
 
 func AddIntersectionPoints(s1 Sensor, s2 Sensor, allIntersectionPoints []Point) []Point {
-    // There is 8 intersection points possible between 2 sensors
-    r1 := s1.ClosestBeaconDistance + 1
-    r2 := s2.ClosestBeaconDistance + 1
-    sx1 := s1.Position.X
-    sy1 := s1.Position.Y
-    sx2 := s2.Position.X
-    sy2 := s2.Position.Y
-    // Constants are named as follows: a for positive gradient, b for negative
-    // first number is the number of the curve (imagine a diamond, the first curve would be the top-right one)
-    // second number is the number of the sensor used to define the point: either the first one or the second one
-    // we need to change sensors' order as values differ
-    a11, a31, b22, b42 := coefCurves(sx1, sy1, sx2, sy2, r1, r2)
-    a12, a32, b21, b41 := coefCurves(sx2, sy2, sx1, sy1, r2, r1)
+	// There is 8 intersection points possible between 2 sensors
+	r1 := s1.ClosestBeaconDistance + 1
+	r2 := s2.ClosestBeaconDistance + 1
+	sx1 := s1.Position.X
+	sy1 := s1.Position.Y
+	sx2 := s2.Position.X
+	sy2 := s2.Position.Y
+	// Constants are named as follows: a for positive gradient, b for negative
+	// first number is the number of the curve (imagine a diamond, the first curve would be the top-right one)
+	// second number is the number of the sensor used to define the point: either the first one or the second one
+	// we need to change sensors' order as values differ
+	a11, a31, b22, b42 := coefCurves(sx1, sy1, sx2, sy2, r1, r2)
+	a12, a32, b21, b41 := coefCurves(sx2, sy2, sx1, sy1, r2, r1)
 
-    // Points are named as follows:
-    // point_12 is the intersection point between curve 1 and 2
-    point_12 := Point {X: (b22 - a11)/2, Y: (b22 + a11)/2}
-    point_21 := Point {X: (b21 - a12)/2, Y: (b21 + a12)/2}
+	// Points are named as follows:
+	// point_12 is the intersection point between curve 1 and 2
+	point_12 := Point{X: (b22 - a11) / 2, Y: (b22 + a11) / 2}
+	point_21 := Point{X: (b21 - a12) / 2, Y: (b21 + a12) / 2}
 
-    point_14 := Point {X: (b42 - a11)/2, Y: (b42 + a11)/2}
-    point_41 := Point {X: (b41 - a12)/2, Y: (b41 + a12)/2}
+	point_14 := Point{X: (b42 - a11) / 2, Y: (b42 + a11) / 2}
+	point_41 := Point{X: (b41 - a12) / 2, Y: (b41 + a12) / 2}
 
-    point_32 := Point {X: (b22 - a31)/2, Y: (b22 + a31)/2}
-    point_23 := Point {X: (b21 - a32)/2, Y: (b21 + a32)/2}
+	point_32 := Point{X: (b22 - a31) / 2, Y: (b22 + a31) / 2}
+	point_23 := Point{X: (b21 - a32) / 2, Y: (b21 + a32) / 2}
 
-    point_34 := Point {X: (b42 - a31)/2, Y: (b42 + a31)/2}
-    point_43 := Point {X: (b41 - a32)/2, Y: (b41 + a32)/2}
-    var allPoints []Point = []Point{point_12, point_21, point_14, point_41, point_32, point_23, point_34, point_43}
-    
-    allPoints = filterBounds(allPoints)
+	point_34 := Point{X: (b42 - a31) / 2, Y: (b42 + a31) / 2}
+	point_43 := Point{X: (b41 - a32) / 2, Y: (b41 + a32) / 2}
+	var allPoints []Point = []Point{point_12, point_21, point_14, point_41, point_32, point_23, point_34, point_43}
 
-    allIntersectionPoints = append(allIntersectionPoints, allPoints...)
-    return allIntersectionPoints
+	allPoints = filterBounds(allPoints)
+
+	allIntersectionPoints = append(allIntersectionPoints, allPoints...)
+	return allIntersectionPoints
 }
 
 func isWithinBounds(p Point) bool {
-    return p.X >= 0 && p.X <=4000000 && p.Y >= 0 && p.Y <= 4000000
+	return p.X >= 0 && p.X <= 4000000 && p.Y >= 0 && p.Y <= 4000000
 }
 
 func filterBounds(allPoints []Point) []Point {
-    var result []Point
-    for _, p := range allPoints {
-        if isWithinBounds(p) {
-            result = append(result, p)
-        }
-    }
+	var result []Point
+	for _, p := range allPoints {
+		if isWithinBounds(p) {
+			result = append(result, p)
+		}
+	}
 
-    return result
+	return result
 }
 
 func removeDuplicate(points []Point) (result []Point) {
-    if len(points) < 1 {
-        result = points
-        return
-    }
-    allKeys := make(map[Point]bool)
-    for _, p := range points {
-        if _, added := allKeys[p]; !added {
-            result = append(result, p)
-            allKeys[p] = true
-        }
-    }
-    
-    return 
+	if len(points) < 1 {
+		result = points
+		return
+	}
+	allKeys := make(map[Point]bool)
+	for _, p := range points {
+		if _, added := allKeys[p]; !added {
+			result = append(result, p)
+			allKeys[p] = true
+		}
+	}
+
+	return
 }
 
 func Abs(x int) int {

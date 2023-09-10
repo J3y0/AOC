@@ -6,7 +6,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
-    "time"
+	"time"
 
 	"day15/sensor"
 )
@@ -17,30 +17,30 @@ func main() {
 		fmt.Printf("Error while opening file\n")
 	}
 
-    sensors, err := parseInput(file)
-    if err != nil {
-        fmt.Println("Error while parsing input file...")
-    }
-    
-    tStart := time.Now()
+	sensors, err := parseInput(file)
+	if err != nil {
+		fmt.Println("Error while parsing input file...")
+	}
+
+	tStart := time.Now()
 	part1, err := solvePart1(sensors)
 	if err != nil {
 		fmt.Printf("Error while solving part 1\n")
 	}
-    tEnd := time.Since(tStart)
+	tEnd := time.Since(tStart)
 
 	fmt.Printf("Solution part1: %d\n", part1)
-    fmt.Printf("It took: %s\n", tEnd)
+	fmt.Printf("It took: %s\n", tEnd)
 
-    tStart = time.Now()
+	tStart = time.Now()
 	part2, err := solvePart2(sensors)
 	if err != nil {
 		fmt.Printf("Error while solving part 2\n")
 	}
-    tEnd = time.Since(tStart)
+	tEnd = time.Since(tStart)
 
 	fmt.Printf("Solution part2: %d\n", part2)
-    fmt.Printf("It took: %s\n", tEnd)
+	fmt.Printf("It took: %s\n", tEnd)
 }
 
 func solvePart1(sensors []sensor.Sensor) (result int, err error) {
@@ -60,34 +60,34 @@ func solvePart1(sensors []sensor.Sensor) (result int, err error) {
 }
 
 func solvePart2(sensors []sensor.Sensor) (result int, err error) {
-    var distress sensor.Point
-    var allIntersections []sensor.Point
-    // Find coord of the beacon emetting distress signal
+	var distress sensor.Point
+	var allIntersections []sensor.Point
+	// Find coord of the beacon emetting distress signal
 
-    for _, s1 := range sensors {
-        for _, s2 := range sensors {
-            allIntersections = sensor.AddIntersectionPoints(s1, s2, allIntersections)
-        }
-    }
-    
-    for _, p := range allIntersections {
-        valid := true
-        for _, s := range sensors {
-            if !valid || sensor.Manhattan(s.Position, p) <= s.ClosestBeaconDistance {
-                valid = false
-                break
-            }
-        }
-        if valid {
-            distress = p
-            break
-        }
-    }
+	for _, s1 := range sensors {
+		for _, s2 := range sensors {
+			allIntersections = sensor.AddIntersectionPoints(s1, s2, allIntersections)
+		}
+	}
 
-    fmt.Printf("Distress signal position: x=%d, y=%d\n", distress.X, distress.Y)
-    // Compute the tuning frequency
-    result = distress.X * 4000000 + distress.Y
-    return
+	for _, p := range allIntersections {
+		valid := true
+		for _, s := range sensors {
+			if !valid || sensor.Manhattan(s.Position, p) <= s.ClosestBeaconDistance {
+				valid = false
+				break
+			}
+		}
+		if valid {
+			distress = p
+			break
+		}
+	}
+
+	fmt.Printf("Distress signal position: x=%d, y=%d\n", distress.X, distress.Y)
+	// Compute the tuning frequency
+	result = distress.X*4000000 + distress.Y
+	return
 }
 
 func parseInput(r io.ReaderAt) ([]sensor.Sensor, error) {
