@@ -1,27 +1,38 @@
-package main
+package days
 
 import (
 	"fmt"
-	"main/utils"
 	"os"
 	"strings"
 )
 
-func main() {
-	measurements, err := parseMeasurements("./input/day1.txt")
+type Day1 struct {
+	measurements []int
+}
+
+func (d *Day1) Part1() (int, error) {
+	measurements, err := parseMeasurements("./input/01_day.txt")
 	if err != nil {
-		fmt.Printf("%v", err)
-		os.Exit(1)
+		return 0, err
+	}
+	d.measurements = measurements
+
+	return CountDepthIncrease(measurements), nil
+}
+
+func (d *Day1) Part2() (int, error) {
+	if len(d.measurements) == 0 {
+		measurements, err := parseMeasurements("./input/01_day.txt")
+		if err != nil {
+			return 0, err
+		}
+		d.measurements = measurements
 	}
 
-	// ----- Part 1 -----
-	totalIncrease := CountDepthIncrease(measurements)
-
-	// ----- Part 2 -----
-	totalIncreaseGrouped := Count3GroupMeasurements(measurements)
-
-	utils.FormatAndPrintResultWithoutTime(totalIncrease, totalIncreaseGrouped)
+	return Count3GroupMeasurements(d.measurements), nil
 }
+
+var Solution1 = Day1{}
 
 func Count3GroupMeasurements(measurementsList []int) (total int) {
 	previousSum := measurementsList[0] + measurementsList[1] + measurementsList[2]

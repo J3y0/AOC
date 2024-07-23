@@ -1,33 +1,34 @@
-package main
+package days
 
 import (
 	"fmt"
 	"main/utils"
-	"os"
 )
 
-func main() {
-	lines, err := utils.ParseLines("./input/day2.txt")
+type Day2 struct {
+	Instructions []string
+}
+
+func (d *Day2) Part1() (int, error) {
+	instructions, err := utils.ParseLines("./input/02_day.txt")
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
+		return 0, err
+	}
+	d.Instructions = instructions
+
+	return ComputeFinalPositionPart1(d.Instructions)
+}
+
+func (d *Day2) Part2() (int, error) {
+	if len(d.Instructions) == 0 {
+		instructions, err := utils.ParseLines("./input/02_day.txt")
+		if err != nil {
+			return 0, err
+		}
+		d.Instructions = instructions
 	}
 
-	// ----- Part 1 -----
-	part1, err := ComputeFinalPositionPart1(lines)
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
-	}
-
-	// ----- Part 2 -----
-	part2, err := ComputeFinalPositionPart2(lines)
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
-	}
-
-	utils.FormatAndPrintResultWithoutTime(part1, part2)
+	return ComputeFinalPositionPart2(d.Instructions)
 }
 
 func ComputeFinalPositionPart1(lines []string) (int, error) {
