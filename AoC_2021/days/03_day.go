@@ -1,30 +1,34 @@
-package main
+package days
 
 import (
-	"fmt"
 	"main/utils"
-	"os"
 	"strconv"
 )
 
-func main() {
-	lines, err := utils.ParseLines("./input/day3.txt")
+type Day3 struct {
+	Binaries []string
+}
+
+func (d *Day3) Part1() (int, error) {
+	binaries, err := utils.ParseLines("./input/03_day.txt")
 	if err != nil {
-		fmt.Printf("%v", err)
-		os.Exit(1)
+		return 0, err
+	}
+	d.Binaries = binaries
+
+	return ComputePowerConsumption(d.Binaries), nil
+}
+
+func (d *Day3) Part2() (int, error) {
+	if len(d.Binaries) == 0 {
+		binaries, err := utils.ParseLines("./input/03_day.txt")
+		if err != nil {
+			return 0, err
+		}
+		d.Binaries = binaries
 	}
 
-	// ----- Part1 -----
-	part1 := ComputePowerConsumption(lines)
-
-	// ----- Part2 -----
-	part2, err := ComputeLifeSupportRating(lines)
-	if err != nil {
-		fmt.Printf("%v", err)
-		os.Exit(1)
-	}
-
-	utils.FormatAndPrintResultWithoutTime(part1, part2)
+	return ComputeLifeSupportRating(d.Binaries)
 }
 
 func ComputeLifeSupportRating(lines []string) (result int, err error) {
