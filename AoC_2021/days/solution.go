@@ -31,6 +31,8 @@ func RunSelectedSolution(day, part int) error {
 		solutionToRun = &Day4{}
 	case 6:
 		solutionToRun = &Day6{}
+	case 7:
+		solutionToRun = &Day7{}
 	default:
 		return &NotInRangeError{message: "day should be between 1 and 25"}
 	}
