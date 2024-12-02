@@ -13,6 +13,8 @@ func SolutionToRun(day, part int) error {
 	switch day {
 	case 1:
 		toRun = &Day1{}
+	case 2:
+		toRun = &Day2{}
 	default:
 	}
 
@@ -34,6 +36,7 @@ func SolutionToRun(day, part int) error {
 			return err
 		}
 		fmt.Println("Part 2:", part2)
+	default:
 	}
 
 	return nil

@@ -1,10 +1,11 @@
 package main
 
 import (
-	"aoc/days"
 	"flag"
 	"fmt"
 	"os"
+
+	"aoc/days"
 )
 
 func Usage() {
