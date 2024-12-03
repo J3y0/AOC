@@ -18,7 +18,7 @@ func main() {
 	var day, part int
 
 	flag.IntVar(&day, "day", 1, "run solution for the day provided (1-25)")
-	flag.IntVar(&part, "part", 1, "part of the day provided to run (1-2)")
+	flag.IntVar(&part, "part", 1, "part of the day provided to run (0-2, 0 run both parts)")
 	flag.Usage = Usage
 
 	flag.Parse()
@@ -28,12 +28,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	if part < 1 || part > 2 {
-		fmt.Fprintln(os.Stderr, "part should be 1 or 2")
+	if part < 0 || part > 2 {
+		fmt.Fprintln(os.Stderr, "part should be 1, 2 or 0 for both parts")
 		os.Exit(1)
 	}
 
-	fmt.Printf("--- Running day %d ---\n", day)
+	fmt.Printf("# --- Running day %d --- #\n", day)
 	if err := days.SolutionToRun(day, part); err != nil {
 		fmt.Fprintf(os.Stderr, "error %v\n", err)
 	}

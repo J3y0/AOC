@@ -11,7 +11,7 @@ type Solution interface {
 	Parse() error
 }
 
-func SolutionToRun(day, part int) error {
+func SolutionToRun(day, part int) (err error) {
 	var toRun Solution
 	switch day {
 	case 1:
@@ -23,35 +23,65 @@ func SolutionToRun(day, part int) error {
 	default:
 	}
 
-	err := toRun.Parse()
+	err = toRun.Parse()
 	if err != nil {
 		return err
 	}
 
-	var tStart, tEnd time.Time
+	// Run part1, 2 or both
 	switch part {
 	case 1:
-		tStart = time.Now()
-		part1, err := toRun.Part1()
+		err = runPart1(toRun)
 		if err != nil {
 			return err
 		}
-		tEnd = time.Now()
-
-		fmt.Println("Part 1:", part1)
-		fmt.Println("Time  :", tEnd.Sub(tStart))
 	case 2:
-		tStart = time.Now()
-		part2, err := toRun.Part2()
+		err = runPart2(toRun)
 		if err != nil {
 			return err
 		}
-		tEnd = time.Now()
-
-		fmt.Println("Part 2:", part2)
-		fmt.Println("Time  :", tEnd.Sub(tStart))
 	default:
+		// Run both part
+		err = runPart1(toRun)
+		if err != nil {
+			return err
+		}
+
+		err = runPart2(toRun)
+		if err != nil {
+			return err
+		}
 	}
 
+	return nil
+}
+
+func runPart1(toRun Solution) error {
+	tStart := time.Now()
+	part1, err := toRun.Part1()
+	if err != nil {
+		return err
+	}
+	tEnd := time.Now()
+
+	fmt.Println("  # ---- Part 1 ---- #")
+	fmt.Println("  | Part 1:", part1)
+	fmt.Println("  | Time  :", tEnd.Sub(tStart))
+	fmt.Println()
+	return nil
+}
+
+func runPart2(toRun Solution) error {
+	tStart := time.Now()
+	part1, err := toRun.Part2()
+	if err != nil {
+		return err
+	}
+	tEnd := time.Now()
+
+	fmt.Println("  # ---- Part 2 ---- #")
+	fmt.Println("  | Part 2:", part1)
+	fmt.Println("  | Time  :", tEnd.Sub(tStart))
+	fmt.Println()
 	return nil
 }
