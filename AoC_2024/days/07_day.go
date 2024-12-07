@@ -4,8 +4,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
-	"aoc/utils"
 )
 
 type Day7 struct {
@@ -13,45 +11,49 @@ type Day7 struct {
 }
 
 func (d *Day7) Part1() (int, error) {
-	tot := 0
+	var tot int64
 	for _, eq := range d.equations {
 		s := strings.Split(eq, ": ")
-		res, err := strconv.Atoi(s[0])
-		if err != nil {
-			return 0, err
-		}
-		op, err := utils.FromLine(s[1], " ")
+		res, err := strconv.ParseInt(s[0], 10, 64)
 		if err != nil {
 			return 0, err
 		}
 
-		if d.recurse(res, op[0], op[1], op[2:]) {
+		nbs := strings.Split(s[1], " ")
+		ops := make([]int64, len(nbs))
+		for i, elt := range nbs {
+			ops[i], _ = strconv.ParseInt(elt, 10, 64)
+		}
+
+		if d.recurse(res, ops) {
 			tot += res
 		}
 	}
 
-	return tot, nil
+	return int(tot), nil
 }
 
 func (d *Day7) Part2() (int, error) {
-	tot := 0
+	var tot int64
 	for _, eq := range d.equations {
 		s := strings.Split(eq, ": ")
-		res, err := strconv.Atoi(s[0])
-		if err != nil {
-			return 0, err
-		}
-		op, err := utils.FromLine(s[1], " ")
+		res, err := strconv.ParseInt(s[0], 10, 64)
 		if err != nil {
 			return 0, err
 		}
 
-		if d.recursePart2(res, op[0], op[1], op[2:]) {
+		nbs := strings.Split(s[1], " ")
+		ops := make([]int64, len(nbs))
+		for i, elt := range nbs {
+			ops[i], _ = strconv.ParseInt(elt, 10, 64)
+		}
+
+		if d.recursePart2(res, ops) {
 			tot += res
 		}
 	}
 
-	return tot, nil
+	return int(tot), nil
 }
 
 func (d *Day7) Parse() error {
@@ -63,54 +65,41 @@ func (d *Day7) Parse() error {
 	return nil
 }
 
-// [..., l, r, ops]
-func (d *Day7) recurse(res, l, r int, ops []int) bool {
-	if len(ops) == 0 {
-		if l*r == res {
-			return true
-		}
-		if l+r == res {
-			return true
-		}
-
-		return false
+func (d *Day7) recurse(res int64, ops []int64) bool {
+	n := len(ops)
+	if n == 1 {
+		return res == ops[0]
+	}
+	if res%ops[n-1] == 0 && d.recurse(res/ops[n-1], ops[:n-1]) {
+		return true
 	}
 
-	if l >= res {
-		return false
+	if res > ops[n-1] && d.recurse(res-ops[n-1], ops[:n-1]) {
+		return true
 	}
-
-	return d.recurse(res, l+r, ops[0], ops[1:]) || d.recurse(res, l*r, ops[0], ops[1:])
+	return false
 }
 
-// [..., l, r, ops]
-func (d *Day7) recursePart2(res, l, r int, ops []int) bool {
-	if len(ops) == 0 {
-		if l*r == res {
-			return true
-		}
-		if l+r == res {
-			return true
-		}
-
-		if d.concatenate(l, r) == res {
-			return true
-		}
-
-		return false
+func (d *Day7) recursePart2(res int64, ops []int64) bool {
+	n := len(ops)
+	if n == 1 {
+		return res == ops[0]
+	}
+	if res%ops[n-1] == 0 && d.recursePart2(res/ops[n-1], ops[:n-1]) {
+		return true
 	}
 
-	if l >= res {
-		return false
+	if res > ops[n-1] && d.recursePart2(res-ops[n-1], ops[:n-1]) {
+		return true
 	}
 
-	return (d.recursePart2(res, l+r, ops[0], ops[1:]) ||
-		d.recursePart2(res, l*r, ops[0], ops[1:]) ||
-		d.recursePart2(res, d.concatenate(l, r), ops[0], ops[1:]))
-}
-
-func (d *Day7) concatenate(a, b int) int {
-	c := strconv.Itoa(a) + strconv.Itoa(b)
-	out, _ := strconv.Atoi(c)
-	return out
+	strRes := strconv.FormatInt(res, 10)
+	strLast := strconv.FormatInt(ops[n-1], 10)
+	if len(strRes) > len(strLast) && strings.HasSuffix(strRes, strLast) {
+		short, _ := strconv.ParseInt(strRes[:len(strRes)-len(strLast)], 10, 64)
+		if d.recursePart2(short, ops[:n-1]) {
+			return true
+		}
+	}
+	return false
 }
