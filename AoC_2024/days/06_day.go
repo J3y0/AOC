@@ -1,29 +1,35 @@
 package days
 
 import (
+	"aoc/utils"
 	"os"
 	"strings"
 )
 
 type Day6 struct {
-	start   [2]int
+	start   utils.Pos
 	grid    [][]rune
-	visited map[[2]int]bool
+	visited map[utils.Pos]bool
 }
 
 func (d *Day6) Part1() (int, error) {
 	count := 1
-	directions := [4][2]int{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
+	directions := [4]utils.Pos{
+		{X: -1, Y: 0},
+		{X: 0, Y: 1},
+		{X: 1, Y: 0},
+		{X: 0, Y: -1},
+	}
 	dir := 0
 	pos := d.start
 
-	d.visited = make(map[[2]int]bool)
+	d.visited = make(map[utils.Pos]bool)
 	d.visited[d.start] = true
-	for d.validPos(pos) {
+	for !utils.OutOfGrid(pos, len(d.grid), len(d.grid[0])) {
 		// Check next wall
-		if d.grid[pos[0]][pos[1]] == '#' {
-			pos[0] = pos[0] - directions[dir][0]
-			pos[1] = pos[1] - directions[dir][1]
+		if d.grid[pos.X][pos.Y] == '#' {
+			pos.X = pos.X - directions[dir].X
+			pos.Y = pos.Y - directions[dir].Y
 			dir = (dir + 1) % len(directions)
 			continue
 		}
@@ -33,8 +39,8 @@ func (d *Day6) Part1() (int, error) {
 			count++
 		}
 		// Update guard position
-		pos[0] = pos[0] + directions[dir][0]
-		pos[1] = pos[1] + directions[dir][1]
+		pos.X = pos.X + directions[dir].X
+		pos.Y = pos.Y + directions[dir].Y
 	}
 	return count, nil
 }
@@ -46,16 +52,16 @@ func (d *Day6) Part2() (int, error) {
 
 	totInfLoop := 0
 	for pos := range d.visited {
-		if pos == d.start || d.grid[pos[0]][pos[1]] == '#' {
+		if pos == d.start || d.grid[pos.X][pos.Y] == '#' {
 			continue
 		}
-		d.grid[pos[0]][pos[1]] = '#'
+		d.grid[pos.X][pos.Y] = '#'
 
 		if d.isInfLoop() {
 			totInfLoop++
 		}
 
-		d.grid[pos[0]][pos[1]] = '.'
+		d.grid[pos.X][pos.Y] = '.'
 	}
 	return totInfLoop, nil
 }
@@ -73,7 +79,7 @@ func (d *Day6) Parse() error {
 		runes := make([]rune, len(l))
 		for j, c := range l {
 			if c == '^' {
-				d.start = [2]int{i, j}
+				d.start = utils.Pos{X: i, Y: j}
 			}
 			runes[j] = c
 		}
@@ -83,34 +89,35 @@ func (d *Day6) Parse() error {
 	return nil
 }
 
-func (d *Day6) validPos(pos [2]int) bool {
-	return pos[0] < len(d.grid) && pos[1] < len(d.grid[0]) && pos[0] >= 0 && pos[1] >= 0
-}
-
 func (d *Day6) isInfLoop() bool {
-	directions := [4][2]int{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
+	directions := [4]utils.Pos{
+		{X: -1, Y: 0},
+		{X: 0, Y: 1},
+		{X: 1, Y: 0},
+		{X: 0, Y: -1},
+	}
 	dir := 0
 	pos := d.start
 
 	visited := make(map[[3]int]bool)
-	for d.validPos(pos) {
-		key := [3]int{pos[0], pos[1], dir}
+	for !utils.OutOfGrid(pos, len(d.grid), len(d.grid[0])) {
+		key := [3]int{pos.X, pos.Y, dir}
 
 		if visited[key] {
 			return true
 		}
 		// Check next wall
-		if d.grid[pos[0]][pos[1]] == '#' {
-			pos[0] = pos[0] - directions[dir][0]
-			pos[1] = pos[1] - directions[dir][1]
+		if d.grid[pos.X][pos.Y] == '#' {
+			pos.X = pos.X - directions[dir].X
+			pos.Y = pos.Y - directions[dir].Y
 			dir = (dir + 1) % len(directions)
 			continue
 		}
 
 		visited[key] = true
 		// Update guard position
-		pos[0] = pos[0] + directions[dir][0]
-		pos[1] = pos[1] + directions[dir][1]
+		pos.X = pos.X + directions[dir].X
+		pos.Y = pos.Y + directions[dir].Y
 	}
 
 	return false
