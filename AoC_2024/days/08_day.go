@@ -3,20 +3,18 @@ package days
 import (
 	"os"
 	"strings"
+
+	"aoc/utils"
 )
 
-type Pos struct {
-	x, y int
-}
-
 type Day8 struct {
-	antennas       map[byte][]Pos
+	antennas       map[byte][]utils.Pos
 	maxRow, maxCol int
 }
 
 func (d *Day8) Part1() (int, error) {
 	antinodes := 0
-	seen := make(map[Pos]bool)
+	seen := make(map[utils.Pos]bool)
 	for _, antennas := range d.antennas {
 		for i := range antennas {
 			for j := i + 1; j < len(antennas); j++ {
@@ -29,7 +27,7 @@ func (d *Day8) Part1() (int, error) {
 
 func (d *Day8) Part2() (int, error) {
 	antinodes := 0
-	seen := make(map[Pos]bool)
+	seen := make(map[utils.Pos]bool)
 	for _, antennas := range d.antennas {
 		for i := range antennas {
 			for j := i + 1; j < len(antennas); j++ {
@@ -49,7 +47,7 @@ func (d *Day8) Parse() error {
 	lines := strings.Split(strings.TrimSpace(string(content)), "\n")
 	d.maxRow = len(lines)
 	d.maxCol = len(lines[0])
-	d.antennas = make(map[byte][]Pos)
+	d.antennas = make(map[byte][]utils.Pos)
 	for i, l := range lines {
 		for j := range l {
 			c := lines[i][j]
@@ -58,27 +56,27 @@ func (d *Day8) Parse() error {
 			}
 
 			if _, ok := d.antennas[c]; ok {
-				d.antennas[c] = append(d.antennas[c], Pos{x: i, y: j})
+				d.antennas[c] = append(d.antennas[c], utils.Pos{X: i, Y: j})
 			} else {
-				d.antennas[c] = make([]Pos, 1)
-				d.antennas[c][0] = Pos{x: i, y: j}
+				d.antennas[c] = make([]utils.Pos, 1)
+				d.antennas[c][0] = utils.Pos{X: i, Y: j}
 			}
 		}
 	}
 	return nil
 }
 
-func (d *Day8) countAntinodes(ant1, ant2 Pos, seen map[Pos]bool, part int) (valid int) {
-	dy := ant2.y - ant1.y
-	dx := ant2.x - ant1.x
+func (d *Day8) countAntinodes(ant1, ant2 utils.Pos, seen map[utils.Pos]bool, part int) (valid int) {
+	dy := ant2.Y - ant1.Y
+	dx := ant2.X - ant1.X
 
 	i := part % 2 // Need 0 for part2 and 1 for part1
 	for {
-		anti1 := Pos{x: ant1.x - i*dx, y: ant1.y - i*dy}
-		anti2 := Pos{x: ant2.x + i*dx, y: ant2.y + i*dy}
+		anti1 := utils.Pos{X: ant1.X - i*dx, Y: ant1.Y - i*dy}
+		anti2 := utils.Pos{X: ant2.X + i*dx, Y: ant2.Y + i*dy}
 
-		anti1Out := d.isOut(anti1)
-		anti2Out := d.isOut(anti2)
+		anti1Out := utils.OutOfGrid(anti1, d.maxRow, d.maxCol)
+		anti2Out := utils.OutOfGrid(anti2, d.maxRow, d.maxCol)
 
 		if anti1Out && anti2Out {
 			break
@@ -101,8 +99,4 @@ func (d *Day8) countAntinodes(ant1, ant2 Pos, seen map[Pos]bool, part int) (vali
 		i++
 	}
 	return
-}
-
-func (d *Day8) isOut(p Pos) bool {
-	return p.x < 0 || p.y < 0 || p.x >= d.maxRow || p.y >= d.maxCol
 }
