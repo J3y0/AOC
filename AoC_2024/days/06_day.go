@@ -1,9 +1,10 @@
 package days
 
 import (
-	"aoc/utils"
 	"os"
 	"strings"
+
+	"aoc/utils"
 )
 
 type Day6 struct {
