@@ -32,3 +32,17 @@ func OmitIndex[S ~[]T, T any](arr S, idx int) S {
 
 	return result
 }
+
+func CopyArr(arr [][]rune) [][]rune {
+	res := make([][]rune, len(arr))
+	for i, elt := range arr {
+		line := make([]rune, len(elt))
+		for j := range elt {
+			line[j] = elt[j]
+		}
+
+		res[i] = line
+	}
+
+	return res
+}
