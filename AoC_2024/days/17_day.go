@@ -1,12 +1,13 @@
 package days
 
 import (
-	"aoc/utils"
 	"fmt"
 	"math"
 	"os"
 	"strconv"
 	"strings"
+
+	"aoc/utils"
 )
 
 type Day17 struct {
