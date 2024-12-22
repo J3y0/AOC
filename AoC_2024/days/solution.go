@@ -52,6 +52,8 @@ func SolutionToRun(day, part int) (err error) {
 		toRun = &Day18{}
 	case 19:
 		toRun = &Day19{}
+	case 20:
+		toRun = &Day20{}
 	default:
 	}
 
