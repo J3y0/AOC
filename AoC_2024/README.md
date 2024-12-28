@@ -28,4 +28,6 @@ The interface is defined in `./days/solution.go`
 - [Day 21](./days/21_day.go)
 - [Day 22](./days/22_day.go)
 - [Day 23](./days/23_day.go)
+- [Day 24](./days/24_day.go)
+- [Day 25](./days/25_day.go)
 
