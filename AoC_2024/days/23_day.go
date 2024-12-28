@@ -1,13 +1,14 @@
 package days
 
 import (
-	"aoc/utils"
 	"fmt"
 	"hash/fnv"
 	"os"
 	"slices"
 	"sort"
 	"strings"
+
+	"aoc/utils"
 )
 
 type Day23 struct {
