@@ -37,9 +37,12 @@ fn main() {
 pub fn parse(input: &str) -> Vec<Policy<'_>> {
     let temp: Vec<&str> = input
         .split(['-', ':', ' ', '\n'])
-        .filter(|s| !s.is_empty()).collect();
+        .filter(|s| !s.is_empty())
+        .collect();
 
-    temp.chunks(4).map(|c| Policy::from([c[0], c[1], c[2], c[3]])).collect()
+    temp.chunks(4)
+        .map(|c| Policy::from([c[0], c[1], c[2], c[3]]))
+        .collect()
 }
 
 pub fn part1(lines: &[Policy<'_>]) -> usize {
@@ -67,10 +70,12 @@ pub fn part2(lines: &[Policy<'_>]) -> usize {
 mod tests {
     use super::*;
 
-    fn example_data()-> Vec<Policy<'static>> {
-        parse("1-3 a: abcde
+    fn example_data() -> Vec<Policy<'static>> {
+        parse(
+            "1-3 a: abcde
 1-3 b: cdefg
-2-9 c: ccccccccc")
+2-9 c: ccccccccc",
+        )
     }
 
     #[test]

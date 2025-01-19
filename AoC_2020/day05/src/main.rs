@@ -16,10 +16,7 @@ fn main() {
 }
 
 pub fn part1(ids: &[usize]) -> usize {
-    *ids
-        .iter()
-        .max()
-        .unwrap()
+    *ids.iter().max().unwrap()
 }
 
 pub fn part2(ids: &[usize]) -> usize {
@@ -65,9 +62,11 @@ mod tests {
     use super::*;
 
     fn example_data() -> Vec<usize> {
-        parse("FBFBBFFRLR
+        parse(
+            "FBFBBFFRLR
 BFFFBBFRRR
-FFFBBBFRRR")
+FFFBBBFRRR",
+        )
     }
 
     #[test]
