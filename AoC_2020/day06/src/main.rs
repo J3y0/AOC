@@ -1,4 +1,4 @@
-use std::{fs, time::Instant, u32};
+use std::{fs, time::Instant};
 
 fn main() {
     let content =

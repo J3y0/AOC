@@ -36,7 +36,7 @@ pub fn part1(bags: &HashMap<u64, Vec<Bag>>) -> usize {
         }
 
         let children = bags.get(cur).unwrap();
-        if children.len() == 0 {
+        if children.is_empty() {
             return false;
         }
 
@@ -50,7 +50,7 @@ pub fn part1(bags: &HashMap<u64, Vec<Bag>>) -> usize {
             .any(|b| contain_shiny_gold(&hash(&b.color), bags, cache));
 
         cache.insert(*cur, result);
-        return result;
+        result
     }
 
     let mut cache: HashMap<u64, bool> = HashMap::new();
@@ -71,7 +71,7 @@ pub fn part2(bags: &HashMap<u64, Vec<Bag>>) -> u32 {
         }
 
         let children = bags.get(cur).unwrap();
-        if children.len() == 0 {
+        if children.is_empty() {
             cache.insert(*cur, 0);
             return 0;
         }

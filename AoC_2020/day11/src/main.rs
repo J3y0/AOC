@@ -53,7 +53,7 @@ fn simulate_people(grid: &Grid, part_one: bool, value: usize) -> usize {
     let mut seats: Vec<Seat> = Vec::new();
     for i in 0..grid.height {
         for j in 0..grid.width {
-            let pos = Point::new(i as i32, j as i32);
+            let pos = Point::new(i, j);
             if grid[pos] == FLOOR {
                 continue;
             }
