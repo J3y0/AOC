@@ -48,6 +48,10 @@ impl Grid {
     pub fn len(&self) -> usize {
         (self.height * self.width) as usize
     }
+
+    pub fn is_empty(&self) -> bool {
+        (self.height * self.width) as usize == 0
+    }
 }
 
 impl Index<Point> for Grid {

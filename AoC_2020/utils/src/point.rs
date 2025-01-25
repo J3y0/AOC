@@ -10,6 +10,10 @@ impl Point {
     pub const fn new(x: i32, y: i32) -> Point {
         Point { x, y }
     }
+
+    pub fn manhattan_distance(&self, other: &Point) -> i32 {
+        (self.x - other.x).abs() + (self.y - other.y).abs()
+    }
 }
 
 impl Add for Point {
