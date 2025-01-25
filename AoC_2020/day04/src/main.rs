@@ -53,14 +53,14 @@ fn parse_block(block: &str) -> Passport {
 fn validate(field: &[&str; 2]) -> bool {
     let value = field[1];
     match field[0] {
-        "byr" => value.parse().is_ok_and(|v| 1920 <= v && v <= 2002),
-        "iyr" => value.parse().is_ok_and(|v| 2010 <= v && v <= 2020),
-        "eyr" => value.parse().is_ok_and(|v| 2020 <= v && v <= 2030),
+        "byr" => value.parse().is_ok_and(|v| (1920..=2002).contains(&v)),
+        "iyr" => value.parse().is_ok_and(|v| (2010..=2020).contains(&v)),
+        "eyr" => value.parse().is_ok_and(|v| (2020..=2030).contains(&v)),
         "hgt" => {
             if value.ends_with("in") {
-                return value[..2].parse().is_ok_and(|v| 59 <= v && v <= 76);
+                value[..2].parse().is_ok_and(|v| (59..=76).contains(&v))
             } else if value.ends_with("cm") {
-                return value[..3].parse().is_ok_and(|v| 150 <= v && v <= 193);
+                return value[..3].parse().is_ok_and(|v| (150..=193).contains(&v));
             } else {
                 return false;
             }

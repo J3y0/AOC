@@ -33,7 +33,7 @@ pub fn parse(input: &str) -> Vec<usize> {
         .lines()
         .map(|p| {
             let (row, col) = get_seat(p);
-            return row * 8 + col;
+            row * 8 + col
         })
         .collect()
 }
