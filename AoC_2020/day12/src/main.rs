@@ -32,11 +32,11 @@ pub fn part1(instructions: &[Instruction]) -> usize {
             'W' => cpos.y -= inst.dist,
             'E' => cpos.y += inst.dist,
             'R' => rotate_right(&mut cdir, inst.dist),
-            'L' =>  rotate_right(&mut cdir, 360-inst.dist),
+            'L' => rotate_right(&mut cdir, 360 - inst.dist),
             'F' => {
                 cpos.x += cdir.x * inst.dist;
                 cpos.y += cdir.y * inst.dist;
-            },
+            }
             _ => unreachable!(),
         }
     }
@@ -54,11 +54,11 @@ pub fn part2(instructions: &[Instruction]) -> usize {
             'W' => cwaypoint.y -= inst.dist,
             'E' => cwaypoint.y += inst.dist,
             'R' => rotate_right(&mut cwaypoint, inst.dist),
-            'L' =>  rotate_right(&mut cwaypoint, 360-inst.dist),
+            'L' => rotate_right(&mut cwaypoint, 360 - inst.dist),
             'F' => {
                 cpos.x += cwaypoint.x * inst.dist;
                 cpos.y += cwaypoint.y * inst.dist;
-            },
+            }
             _ => unreachable!(),
         }
     }
@@ -71,7 +71,10 @@ fn parse(input: &str) -> Vec<Instruction> {
         .lines()
         .map(|l| {
             let of = l[1..].parse::<i32>().unwrap();
-            Instruction{ code: l.chars().next().unwrap(), dist: of}
+            Instruction {
+                code: l.chars().next().unwrap(),
+                dist: of,
+            }
         })
         .collect()
 }
@@ -82,31 +85,32 @@ fn rotate_right(direction: &mut Point, dist: i32) {
             let temp = direction.x;
             direction.x = direction.y;
             direction.y = -temp;
-        },
+        }
         180 => {
             direction.x = -direction.x;
             direction.y = -direction.y;
-        },
+        }
         270 => {
             let temp = direction.x;
             direction.x = -direction.y;
             direction.y = temp;
-        },
+        }
         _ => unreachable!(),
     }
 }
-
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     fn example_data() -> Vec<Instruction> {
-        parse("F10
+        parse(
+            "F10
 N3
 F7
 R90
-F11")
+F11",
+        )
     }
 
     #[test]
