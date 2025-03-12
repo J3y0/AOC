@@ -54,7 +54,7 @@ pub fn part2(input: &Input) -> u64 {
             let inv_modulo = extended_euclidean_algorithm(nb, bus_signed).1;
             let coef = ai * nb * inv_modulo;
 
-            sol = (sol + (coef % n + n) % n)%n;
+            sol = (sol + (coef % n + n) % n) % n;
         }
     }
 
