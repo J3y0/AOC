@@ -1,16 +1,14 @@
 use regex::Regex;
 use std::{fs, time::Instant};
 
-#[derive(Debug)]
 pub struct Mask {
-    and_mask: u64,
-    or_mask: u64,
+    one_mask: u64,
+    x_mask: u64,
 }
 
-#[derive(Debug)]
 pub enum Instruction {
     UpdateMask(Mask),
-    UpdateMemory((usize, u64)),
+    UpdateMemory((u64, u64)),
 }
 
 pub struct Program {
@@ -37,19 +35,20 @@ fn main() {
 pub fn part1(program: &Program) -> u64 {
     let mut memory = vec![0; program.size_mem + 1];
     let mut current_mask = Mask {
-        and_mask: 0,
-        or_mask: 0,
+        one_mask: 0,
+        x_mask: 0,
     };
 
     for instr in &program.instr {
         match instr {
             Instruction::UpdateMask(new_mask) => {
-                current_mask.and_mask = new_mask.and_mask;
-                current_mask.or_mask = new_mask.or_mask;
+                current_mask.x_mask = new_mask.x_mask;
+                current_mask.one_mask = new_mask.one_mask;
             }
             Instruction::UpdateMemory((loc, val)) => {
-                let mask_val = (val | current_mask.or_mask) & current_mask.and_mask;
-                memory[*loc] = mask_val;
+                let mask_val =
+                    (val | current_mask.one_mask) & (current_mask.one_mask | current_mask.x_mask);
+                memory[*loc as usize] = mask_val;
             }
         }
     }
@@ -58,8 +57,26 @@ pub fn part1(program: &Program) -> u64 {
 }
 
 #[allow(unused)]
-pub fn part2(program: &Program) -> usize {
-    0
+pub fn part2(program: &Program) -> u64 {
+    let mut memory = vec![0; program.size_mem + 1];
+    let mut current_mask = Mask {
+        one_mask: 0,
+        x_mask: 0,
+    };
+
+    for instr in &program.instr {
+        match instr {
+            Instruction::UpdateMask(new_mask) => {
+                current_mask.x_mask = new_mask.x_mask;
+                current_mask.one_mask = new_mask.one_mask;
+            }
+            Instruction::UpdateMemory((loc, val)) => {
+                let masked_loc = loc | current_mask.one_mask;
+            }
+        }
+    }
+
+    memory.iter().sum()
 }
 
 fn parse(input: &str) -> Program {
@@ -67,16 +84,17 @@ fn parse(input: &str) -> Program {
     let mut instr = vec![];
     for line in input.lines() {
         if line.starts_with("mask = ") {
-            let mut and_mask: u64 = 0xffffffffff;
-            let mut or_mask: u64 = 0x0;
+            let mut one_mask: u64 = 0x0;
+            let mut x_mask: u64 = 0x0;
+
             line[7..].chars().enumerate().for_each(|(i, c)| match c {
-                '1' => or_mask |= 1 << (35 - i),
-                '0' => and_mask ^= 1 << (35 - i),
-                'X' => (),
+                '1' => one_mask |= 1 << (35 - i),
+                'X' => x_mask |= 1 << (35 - i),
+                '0' => (),
                 _ => unreachable!(),
             });
 
-            instr.push(Instruction::UpdateMask(Mask { and_mask, or_mask }));
+            instr.push(Instruction::UpdateMask(Mask { one_mask, x_mask }));
         } else {
             let re = Regex::new(r"mem\[(\d+)\] = (\d+)").unwrap();
 
@@ -94,7 +112,10 @@ fn parse(input: &str) -> Program {
         }
     }
 
-    Program { instr, size_mem }
+    Program {
+        instr,
+        size_mem: size_mem as usize,
+    }
 }
 
 #[cfg(test)]
