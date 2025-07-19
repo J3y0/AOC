@@ -4,6 +4,7 @@ use std::{
 };
 
 use crate::cookies::session;
+use crate::{Part, client::AocClient};
 
 pub fn cmd_set_session(session: &str) {
     let home_path = env::home_dir().expect("cannot get HOME var env");
@@ -46,4 +47,37 @@ pub fn cmd_get_session() {
     }
 
     fs::remove_file(tmp_path).expect("cannot remove tmp database file");
+}
+
+pub fn cmd_get_input_file(year: usize, day: usize, output: &str) {
+    let client = match AocClient::new() {
+        Ok(c) => c,
+        Err(e) => panic!("error building AoC client: {}", e),
+    };
+
+    let resp = match client.get_input_file(year, day) {
+        Ok(res) => res,
+        Err(e) => panic!("reqwest error: {}", e),
+    };
+
+    fs::write(output, resp).expect("cannot write to file");
+}
+
+pub fn cmd_submit_answer(year: usize, day: usize, part: Part, answer: &str) {
+    let client = match AocClient::new() {
+        Ok(c) => c,
+        Err(e) => panic!("error building AoC client: {}", e),
+    };
+
+    let resp = match client.post_answer(year, day, part, answer) {
+        Ok(res) => res,
+        Err(e) => panic!("reqwest error: {}", e),
+    };
+
+    // Validate answer
+    if resp.contains("That's the right answer!") {
+        println!("Correct ! That's the right answer.");
+    } else {
+        println!("That is not the right answer...");
+    }
 }
