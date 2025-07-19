@@ -1,8 +1,9 @@
+mod client;
 mod commands;
 mod cookies;
 
 use clap::{Args, Parser, Subcommand, ValueEnum};
-use commands::{cmd_get_session, cmd_set_session};
+use commands::{cmd_get_input_file, cmd_get_session, cmd_set_session, cmd_submit_answer};
 use std::ops::RangeInclusive;
 
 const YEAR_RANGE: RangeInclusive<usize> = 2015..=2025;
@@ -91,15 +92,14 @@ fn main() {
                 None => format!("{}_{}_day.txt", get_args.year, get_args.day),
             };
 
-            println!(
-                "year: {}, day: {}, output: {}",
-                get_args.year, get_args.day, output
-            );
+            cmd_get_input_file(get_args.year, get_args.day, &output);
         }
         Command::Submit(submit_args) => {
-            println!(
-                "year: {}, day: {}, part: {}",
-                submit_args.year, submit_args.day, submit_args.part
+            cmd_submit_answer(
+                submit_args.year,
+                submit_args.day,
+                submit_args.part,
+                &submit_args.answer,
             );
         }
         Command::GetSession => cmd_get_session(),
