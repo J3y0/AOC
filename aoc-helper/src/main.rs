@@ -52,9 +52,9 @@ struct Cli {
 #[derive(Subcommand)]
 enum Command {
     /// Get an input file
-    Get(GetArgs),
+    Input(InputArgs),
     /// Submit an answer
-    Submit(SubmitArgs),
+    Answer(AnswerArgs),
     /// Retrieve cookie session and set it. You should have previously logged in adventofcode using Firefox.
     GetSession,
     /// Set specified cookie session.
@@ -62,7 +62,7 @@ enum Command {
 }
 
 #[derive(Args)]
-struct GetArgs {
+struct InputArgs {
     #[arg(short, long, help = "output filepath [default: <year>_<day>_day.txt]")]
     output: Option<String>,
     #[arg(short, long, help = "year to use", value_parser = year_in_range)]
@@ -72,7 +72,7 @@ struct GetArgs {
 }
 
 #[derive(Args)]
-struct SubmitArgs {
+struct AnswerArgs {
     #[arg(short, long, help = "year to use for submission", value_parser = year_in_range)]
     year: usize,
     #[arg(short, long, help = "day to use for submission", value_parser = day_in_range)]
@@ -86,20 +86,20 @@ fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Command::Get(get_args) => {
-            let output = match get_args.output {
+        Command::Input(input_args) => {
+            let output = match input_args.output {
                 Some(o) => o,
-                None => format!("{}_{}_day.txt", get_args.year, get_args.day),
+                None => format!("{}_{}_day.txt", input_args.year, input_args.day),
             };
 
-            cmd_get_input_file(get_args.year, get_args.day, &output);
+            cmd_get_input_file(input_args.year, input_args.day, &output);
         }
-        Command::Submit(submit_args) => {
+        Command::Answer(answer_args) => {
             cmd_submit_answer(
-                submit_args.year,
-                submit_args.day,
-                submit_args.part,
-                &submit_args.answer,
+                answer_args.year,
+                answer_args.day,
+                answer_args.part,
+                &answer_args.answer,
             );
         }
         Command::GetSession => cmd_get_session(),
