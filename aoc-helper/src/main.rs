@@ -1,7 +1,7 @@
 mod commands;
 mod cookies;
 
-use clap::{Args, Parser, Subcommand};
+use clap::{Args, Parser, Subcommand, ValueEnum};
 use commands::{cmd_get_session, cmd_set_session};
 use std::ops::RangeInclusive;
 
@@ -34,13 +34,10 @@ fn day_in_range(d: &str) -> Result<usize, String> {
     }
 }
 
-fn part_valid(p: &str) -> Result<u8, String> {
-    let part: u8 = p.parse().map_err(|_| format!("`{p}` is not a number."))?;
-    if part == 1 || part == 2 {
-        Ok(part)
-    } else {
-        Err(format!("`{part}` not valid, should be 1 or 2."))
-    }
+#[derive(Clone, ValueEnum)]
+enum Part {
+    One,
+    Two,
 }
 
 #[derive(Parser)]
@@ -53,13 +50,13 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// get an input file
+    /// Get an input file
     Get(GetArgs),
-    /// submit the result for a year, day and part
+    /// Submit an answer
     Submit(SubmitArgs),
-    /// retrieve cookie session. You should have previously logged in adventofcode using Firefox.
+    /// Retrieve cookie session and set it. You should have previously logged in adventofcode using Firefox.
     GetSession,
-    /// set cookie session to use for future requests.
+    /// Set specified cookie session.
     SetSession { session: String },
 }
 
@@ -79,8 +76,9 @@ struct SubmitArgs {
     year: usize,
     #[arg(short, long, help = "day to use for submission", value_parser = day_in_range)]
     day: usize,
-    #[arg(short, long, help = "part to use for submission", value_parser = part_valid)]
-    part: u8,
+    #[arg(short, long, help = "part to use for submission", value_enum)]
+    part: Part,
+    answer: String,
 }
 
 fn main() {
