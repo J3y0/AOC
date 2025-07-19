@@ -1,4 +1,8 @@
+mod commands;
+mod cookies;
+
 use clap::{Args, Parser, Subcommand};
+use commands::{cmd_get_session, cmd_set_session};
 use std::ops::RangeInclusive;
 
 const YEAR_RANGE: RangeInclusive<usize> = 2015..=2025;
@@ -53,6 +57,10 @@ enum Command {
     Get(GetArgs),
     /// submit the result for a year, day and part
     Submit(SubmitArgs),
+    /// retrieve cookie session. You should have previously logged in adventofcode using Firefox.
+    GetSession,
+    /// set cookie session to use for future requests.
+    SetSession { session: String },
 }
 
 #[derive(Args)]
@@ -96,5 +104,7 @@ fn main() {
                 submit_args.year, submit_args.day, submit_args.part
             );
         }
+        Command::GetSession => cmd_get_session(),
+        Command::SetSession { session } => cmd_set_session(&session),
     }
 }
