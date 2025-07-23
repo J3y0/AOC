@@ -1,8 +1,14 @@
 use std::{env, fs};
 
-use reqwest::{blocking, header};
+use reqwest::{
+    blocking::{self, Response},
+    header,
+};
 
-use crate::Part;
+use crate::{
+    Part,
+    cookies::session::{CONFIG_DIR, SESSION_FILE},
+};
 
 const BASE_URL: &str = "https://adventofcode.com";
 
@@ -14,7 +20,7 @@ pub struct AocClient {
 impl AocClient {
     pub fn new() -> Result<AocClient, reqwest::Error> {
         let home_dir = env::home_dir().expect("cannot read HOME var env");
-        let session = fs::read_to_string(home_dir.join(".config/aoc-helper/session"))
+        let session = fs::read_to_string(home_dir.join(CONFIG_DIR).join(SESSION_FILE))
             .expect("missing session file. Did you correctly set up the session using get-session or set-session commands ?");
 
         let mut headers = header::HeaderMap::new();
@@ -33,18 +39,18 @@ impl AocClient {
         })
     }
 
-    pub fn get_input_file(&self, year: usize, day: usize) -> Result<String, reqwest::Error> {
+    pub fn get_input_file(&self, year: usize, day: usize) -> Result<Response, reqwest::Error> {
         let url = format!("{}/{year}/day/{day}/input", self.base_url);
-        self.client.get(url).send()?.text()
+        self.client.get(url).send()
     }
 
     pub fn post_answer(
         &self,
         year: usize,
         day: usize,
-        part: Part,
+        part: &Part,
         answer: &str,
-    ) -> Result<String, reqwest::Error> {
+    ) -> Result<Response, reqwest::Error> {
         let url = format!("{}/{year}/day/{day}/answer", self.base_url);
 
         let part_str = match part {
@@ -55,7 +61,6 @@ impl AocClient {
         self.client
             .post(url)
             .form(&[("level", part_str), ("answer", answer)])
-            .send()?
-            .text()
+            .send()
     }
 }
