@@ -1,3 +1,4 @@
+use anyhow::{Context, anyhow};
 use std::{
     env, fs,
     path::{Path, PathBuf},
@@ -6,78 +7,87 @@ use std::{
 use crate::cookies::session;
 use crate::{Part, client::AocClient};
 
-pub fn cmd_set_session(session: &str) {
-    let home_path = env::home_dir().expect("cannot get HOME var env");
-    let config_dir_path = home_path.join(".config/aoc-helper/");
-    if !fs::exists(&config_dir_path).unwrap() {
-        match fs::create_dir(&config_dir_path) {
-            Ok(_) => {}
-            Err(e) => eprintln!("error creating config dir: {}", e),
-        }
-    }
+pub fn cmd_set_session(session: &str) -> anyhow::Result<()> {
+    session::write_session_to_file(session, session::SESSION_FILE)
+        .with_context(|| format!("could not set up session: {}", session))?;
 
-    match fs::write(config_dir_path.join("session"), session) {
-        Ok(_) => println!("session set up successfully"),
-        Err(e) => eprintln!("error writting to session file: {}", e),
-    }
+    println!("session set up successfully");
+    Ok(())
 }
 
-pub fn cmd_get_session() {
-    let home_path = env::home_dir().expect("cannot get HOME varenv");
+pub fn cmd_get_session() -> anyhow::Result<()> {
+    let home_path = env::home_dir().unwrap();
     let search_path = home_path.join(".mozilla/firefox/*.default-release/cookies.sqlite");
+    let search_path_str = search_path.to_str().unwrap();
 
     let mut path = PathBuf::new();
-    for entry in glob::glob(search_path.to_str().unwrap()).expect("failed to read glob pattern") {
+    for entry in glob::glob(search_path_str)
+        .with_context(|| format!("failed to read glob pattern: {}", search_path_str))?
+    {
         if let Ok(ent) = entry {
             path = ent;
         }
     }
 
+    let filename = path.file_name().ok_or(anyhow!(
+        "could not find firefox database file: cookies.sqlite"
+    ))?;
+
     // tmp database if firefox open
-    let tmp_path = Path::new("/tmp").join(path.file_name().unwrap());
+    let tmp_path = Path::new("/tmp").join(filename);
     println!("tmp_path: {:?}", &tmp_path);
-    let _ = fs::copy(path, &tmp_path);
+    fs::copy(path, &tmp_path)?;
 
-    match session::retrieve_session(&tmp_path) {
-        Ok(session) => {
-            println!("session retrieved successfully: \"{}\"", session);
-            cmd_set_session(&session);
-        }
-        Err(e) => eprintln!("error retrieving session: {}", e),
-    }
+    let session = session::retrieve_session(&tmp_path)
+        .map_err(|err| anyhow!(err))
+        .context("could not retrieve session")?;
 
-    fs::remove_file(tmp_path).expect("cannot remove tmp database file");
+    session::write_session_to_file(&session, session::SESSION_FILE)
+        .context("could not save session")?;
+    fs::remove_file(tmp_path)?;
+
+    println!("session retrieved and saved successfully");
+    Ok(())
 }
 
-pub fn cmd_get_input_file(year: usize, day: usize, output: &str) {
-    let client = match AocClient::new() {
-        Ok(c) => c,
-        Err(e) => panic!("error building AoC client: {}", e),
-    };
+pub fn cmd_get_input_file(year: usize, day: usize, output: &str) -> anyhow::Result<()> {
+    let client = AocClient::new().context("could not build aoc client for future requests")?;
 
-    let resp = match client.get_input_file(year, day) {
-        Ok(res) => res,
-        Err(e) => panic!("reqwest error: {}", e),
-    };
+    let response = client
+        .get_input_file(year, day)
+        .context(format!("could not get input file for date: '{year}-{day:02}'"))?
+        .error_for_status()
+        .context(format!("could not get input file for date: '{year}-{day:02}'. Are you sure the session cookie is correctly set up ?"))?;
 
-    fs::write(output, resp).expect("cannot write to file");
+    fs::write(output, response.text().unwrap()).context("could not write input data to file")?;
+
+    println!(
+        "input data successfully retrieved and saved to '{}'",
+        output
+    );
+    Ok(())
 }
 
-pub fn cmd_submit_answer(year: usize, day: usize, part: Part, answer: &str) {
-    let client = match AocClient::new() {
-        Ok(c) => c,
-        Err(e) => panic!("error building AoC client: {}", e),
-    };
+pub fn cmd_submit_answer(year: usize, day: usize, part: &Part, answer: &str) -> anyhow::Result<()> {
+    let client = AocClient::new().context("could not build aoc client for future requests")?;
 
-    let resp = match client.post_answer(year, day, part, answer) {
-        Ok(res) => res,
-        Err(e) => panic!("reqwest error: {}", e),
-    };
+    let response = client
+        .post_answer(year, day, part, answer)
+        .context(format!(
+            "could not submit '{answer}' for date '{year}-{day:02}', part {part}"
+        ))?
+        .error_for_status()
+        .context(format!(
+            "could not submit '{answer}' for date '{year}-{day:02}', part {part}. Are you sure the session cookie is correctly set up ?"
+        ))?;
+
+    let response_text = response.text()?;
 
     // Validate answer
-    if resp.contains("That's the right answer!") {
+    if response_text.contains("That's the right answer!") {
         println!("Correct ! That's the right answer.");
     } else {
         println!("That is not the right answer...");
     }
+    Ok(())
 }

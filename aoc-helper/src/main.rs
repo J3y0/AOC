@@ -2,9 +2,10 @@ mod client;
 mod commands;
 mod cookies;
 
+use anyhow;
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use commands::{cmd_get_input_file, cmd_get_session, cmd_set_session, cmd_submit_answer};
-use std::ops::RangeInclusive;
+use std::{fmt::Display, ops::RangeInclusive, process};
 
 const YEAR_RANGE: RangeInclusive<usize> = 2015..=2025;
 const DAY_RANGE: RangeInclusive<usize> = 1..=25;
@@ -41,6 +42,15 @@ enum Part {
     Two,
 }
 
+impl Display for Part {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::One => write!(f, "1"),
+            Self::Two => write!(f, "2"),
+        }
+    }
+}
+
 #[derive(Parser)]
 #[command(name = "aoc-helper")]
 #[command(about = "CLI to help you interact with Advent Of Code.")]
@@ -55,9 +65,9 @@ enum Command {
     Input(InputArgs),
     /// Submit an answer
     Answer(AnswerArgs),
-    /// Retrieve cookie session and set it. You should have previously logged in adventofcode using Firefox.
+    /// Retrieve cookie session from Firefox
     GetSession,
-    /// Set specified cookie session.
+    /// Set given cookie session
     SetSession { session: String },
 }
 
@@ -85,24 +95,32 @@ struct AnswerArgs {
 fn main() {
     let cli = Cli::parse();
 
-    match cli.command {
+    run(&cli).unwrap_or_else(|err| {
+        eprintln!("error: {:?}", err);
+        process::exit(1);
+    });
+}
+
+fn run(opts: &Cli) -> anyhow::Result<()> {
+    match &opts.command {
         Command::Input(input_args) => {
-            let output = match input_args.output {
+            let output = match input_args.output.clone() {
                 Some(o) => o,
                 None => format!("{}_{}_day.txt", input_args.year, input_args.day),
             };
 
-            cmd_get_input_file(input_args.year, input_args.day, &output);
+            cmd_get_input_file(input_args.year, input_args.day, &output)?;
         }
         Command::Answer(answer_args) => {
             cmd_submit_answer(
                 answer_args.year,
                 answer_args.day,
-                answer_args.part,
+                &answer_args.part,
                 &answer_args.answer,
-            );
+            )?;
         }
-        Command::GetSession => cmd_get_session(),
-        Command::SetSession { session } => cmd_set_session(&session),
+        Command::GetSession => cmd_get_session()?,
+        Command::SetSession { session } => cmd_set_session(&session)?,
     }
+    Ok(())
 }
