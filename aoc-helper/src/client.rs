@@ -26,7 +26,7 @@ impl AocClient {
         let mut headers = header::HeaderMap::new();
 
         let mut session_value =
-            header::HeaderValue::from_str(format!("session={}", session).as_str()).unwrap();
+            header::HeaderValue::from_str(format!("session={session}").as_str()).unwrap();
         session_value.set_sensitive(true);
 
         headers.insert(header::COOKIE, session_value);

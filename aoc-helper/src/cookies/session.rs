@@ -10,29 +10,29 @@ pub const SESSION_FILE: &str = "session";
 
 #[derive(Debug)]
 pub enum SessionError {
-    ConnectionError(diesel::result::ConnectionError),
-    QueryError(diesel::result::Error),
-    NotFoundError,
+    Connection(diesel::result::ConnectionError),
+    Query(diesel::result::Error),
+    NotFound,
 }
 
 impl From<diesel::result::ConnectionError> for SessionError {
     fn from(value: diesel::result::ConnectionError) -> Self {
-        Self::ConnectionError(value)
+        Self::Connection(value)
     }
 }
 
 impl From<diesel::result::Error> for SessionError {
     fn from(value: diesel::result::Error) -> Self {
-        Self::QueryError(value)
+        Self::Query(value)
     }
 }
 
 impl fmt::Display for SessionError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match self {
-            Self::ConnectionError(e) => write!(f, "connection to database error: {e}"),
-            Self::QueryError(e) => write!(f, "query database error: {e}"),
-            Self::NotFoundError => write!(f, "'.adventofcode.com' session not found"),
+            Self::Connection(e) => write!(f, "connection to database error: {e}"),
+            Self::Query(e) => write!(f, "query database error: {e}"),
+            Self::NotFound => write!(f, "'.adventofcode.com' session not found"),
         }
     }
 }
@@ -59,9 +59,9 @@ pub fn retrieve_session<P: AsRef<Path>>(path: P) -> Result<String, SessionError>
         session
             .value
             .to_owned()
-            .ok_or_else(|| SessionError::NotFoundError)
+            .ok_or_else(|| SessionError::NotFound)
     } else {
-        Err(SessionError::NotFoundError)
+        Err(SessionError::NotFound)
     }
 }
 
