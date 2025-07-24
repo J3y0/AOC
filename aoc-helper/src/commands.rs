@@ -9,7 +9,7 @@ use crate::{Part, client::AocClient};
 
 pub fn cmd_set_session(session: &str) -> anyhow::Result<()> {
     session::write_session_to_file(session, session::SESSION_FILE)
-        .with_context(|| format!("could not set up session: {}", session))?;
+        .with_context(|| format!("could not set up session: {session}"))?;
 
     println!("session set up successfully");
     Ok(())
@@ -22,11 +22,10 @@ pub fn cmd_get_session() -> anyhow::Result<()> {
 
     let mut path = PathBuf::new();
     for entry in glob::glob(search_path_str)
-        .with_context(|| format!("failed to read glob pattern: {}", search_path_str))?
+        .with_context(|| format!("failed to read glob pattern: {search_path_str}"))?
+        .flatten()
     {
-        if let Ok(ent) = entry {
-            path = ent;
-        }
+        path = entry;
     }
 
     let filename = path.file_name().ok_or(anyhow!(
@@ -61,10 +60,7 @@ pub fn cmd_get_input_file(year: usize, day: usize, output: &str) -> anyhow::Resu
 
     fs::write(output, response.text().unwrap()).context("could not write input data to file")?;
 
-    println!(
-        "input data successfully retrieved and saved to '{}'",
-        output
-    );
+    println!("input data successfully retrieved and saved to '{output}'");
     Ok(())
 }
 

@@ -1,5 +1,3 @@
-use diesel;
-
 diesel::table! {
     moz_cookies (id) {
         id -> Nullable<Integer>,

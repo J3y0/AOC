@@ -2,7 +2,6 @@ mod client;
 mod commands;
 mod cookies;
 
-use anyhow;
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use commands::{cmd_get_input_file, cmd_get_session, cmd_set_session, cmd_submit_answer};
 use std::{fmt::Display, ops::RangeInclusive, process};
@@ -96,7 +95,7 @@ fn main() {
     let cli = Cli::parse();
 
     run(&cli).unwrap_or_else(|err| {
-        eprintln!("error: {:?}", err);
+        eprintln!("error: {err:?}");
         process::exit(1);
     });
 }
@@ -120,7 +119,7 @@ fn run(opts: &Cli) -> anyhow::Result<()> {
             )?;
         }
         Command::GetSession => cmd_get_session()?,
-        Command::SetSession { session } => cmd_set_session(&session)?,
+        Command::SetSession { session } => cmd_set_session(session)?,
     }
     Ok(())
 }
