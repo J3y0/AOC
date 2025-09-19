@@ -7,7 +7,7 @@ use reqwest::{
 };
 
 use crate::{
-    Part,
+    cli::Part,
     cookies::session::{CONFIG_DIR, SESSION_FILE},
 };
 

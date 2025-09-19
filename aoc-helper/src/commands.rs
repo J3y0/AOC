@@ -6,7 +6,7 @@ use std::{
 };
 
 use crate::cookies::session;
-use crate::{Part, client::AocClient};
+use crate::{cli::Part, client::AocClient};
 
 pub fn cmd_set_session(session: &str) -> anyhow::Result<()> {
     session::write_session_to_file(session, session::SESSION_FILE)
