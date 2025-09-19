@@ -1,5 +1,6 @@
 use diesel::prelude::*;
 use diesel::{ConnectionResult, SqliteConnection};
+use log::debug;
 use std::path::Path;
 use std::{env, fmt, fs, io};
 
@@ -46,7 +47,7 @@ pub fn retrieve_session<P: AsRef<Path>>(path: P) -> Result<String, SessionError>
     use super::schema::moz_cookies::dsl::{host, moz_cookies, name};
 
     let mut conn = connect_database(path)?;
-    println!("[+] connected to database");
+    debug!("connected to database");
 
     let records = moz_cookies
         .filter(host.eq(".adventofcode.com"))
@@ -54,6 +55,7 @@ pub fn retrieve_session<P: AsRef<Path>>(path: P) -> Result<String, SessionError>
         .limit(1)
         .load::<Cookies>(&mut conn)?;
 
+    debug!("retrieved: {} record", records.len());
     if !records.is_empty() {
         let session = &records[0];
         session

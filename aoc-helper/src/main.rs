@@ -1,9 +1,11 @@
 mod client;
 mod commands;
 mod cookies;
+mod logging;
 
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use commands::{cmd_get_input_file, cmd_get_session, cmd_set_session, cmd_submit_answer};
+use log::{LevelFilter, error};
 use std::{fmt::Display, ops::RangeInclusive, process};
 
 const YEAR_RANGE: RangeInclusive<usize> = 2015..=2025;
@@ -54,6 +56,8 @@ impl Display for Part {
 #[command(name = "aoc-helper")]
 #[command(about = "CLI to help you interact with Advent Of Code.")]
 struct Cli {
+    #[arg(short, long, global = true, help = "debug output")]
+    verbose: bool,
     #[command(subcommand)]
     command: Command,
 }
@@ -91,11 +95,24 @@ struct AnswerArgs {
     answer: String,
 }
 
+const LOG_FILE: &str = "aoc.log";
+
 fn main() {
     let cli = Cli::parse();
 
+    let log_level = if cli.verbose {
+        LevelFilter::Debug
+    } else {
+        LevelFilter::Info
+    };
+
+    match logging::init_logs(log_level, LOG_FILE) {
+        Err(e) => panic!("failed to init logs: {e}"),
+        Ok(_) => {}
+    }
+
     run(&cli).unwrap_or_else(|err| {
-        eprintln!("error: {err:?}");
+        error!("{err:?}");
         process::exit(1);
     });
 }
