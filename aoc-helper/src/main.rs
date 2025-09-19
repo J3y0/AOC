@@ -22,7 +22,8 @@ fn main() {
     };
 
     if let Err(e) = logging::init_logs(log_level, LOG_FILE) {
-        panic!("failed to init logs: {e}");
+        error!("failed to init logs: {e}");
+        process::exit(1);
     }
 
     run(&cli).unwrap_or_else(|err| {
