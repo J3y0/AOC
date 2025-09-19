@@ -1,3 +1,4 @@
+use log::debug;
 use std::{env, fs};
 
 use reqwest::{
@@ -41,6 +42,8 @@ impl AocClient {
 
     pub fn get_input_file(&self, year: usize, day: usize) -> Result<Response, reqwest::Error> {
         let url = format!("{}/{year}/day/{day}/input", self.base_url);
+
+        debug!("preparing: GET {url}");
         self.client.get(url).send()
     }
 
@@ -58,6 +61,7 @@ impl AocClient {
             Part::Two => "2",
         };
 
+        debug!("preparing: POST {url} - level: {part_str}, answer: {answer}");
         self.client
             .post(url)
             .form(&[("level", part_str), ("answer", answer)])

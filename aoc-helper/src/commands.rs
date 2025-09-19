@@ -1,4 +1,5 @@
 use anyhow::{Context, anyhow};
+use log::{debug, info};
 use std::{
     env, fs,
     path::{Path, PathBuf},
@@ -11,7 +12,7 @@ pub fn cmd_set_session(session: &str) -> anyhow::Result<()> {
     session::write_session_to_file(session, session::SESSION_FILE)
         .with_context(|| format!("could not set up session: {session}"))?;
 
-    println!("session set up successfully");
+    info!("session set up successfully to: {session}");
     Ok(())
 }
 
@@ -28,62 +29,74 @@ pub fn cmd_get_session() -> anyhow::Result<()> {
         path = entry;
     }
 
+    debug!("found glob pattern for {search_path_str}");
+
     let filename = path.file_name().ok_or(anyhow!(
         "could not find firefox database file: cookies.sqlite"
     ))?;
 
     // tmp database if firefox open
     let tmp_path = Path::new("/tmp").join(filename);
-    println!("tmp_path: {:?}", &tmp_path);
+    debug!("tmp_path: {:?}", &tmp_path);
     fs::copy(path, &tmp_path)?;
 
     let session = session::retrieve_session(&tmp_path)
         .map_err(|err| anyhow!(err))
         .context("could not retrieve session")?;
 
+    debug!("retrieve session ok");
+
     session::write_session_to_file(&session, session::SESSION_FILE)
         .context("could not save session")?;
     fs::remove_file(tmp_path)?;
 
-    println!("session retrieved and saved successfully");
+    info!("session retrieved and saved successfully");
     Ok(())
 }
 
 pub fn cmd_get_input_file(year: usize, day: usize, output: &str) -> anyhow::Result<()> {
     let client = AocClient::new().context("could not build aoc client for future requests")?;
 
+    debug!("aoc client ok");
+
     let response = client
         .get_input_file(year, day)
-        .context(format!("could not get input file for date: '{year}-{day:02}'"))?
+        .context(format!("could not get input file for year: {year} and day: {day:02}."))?
         .error_for_status()
-        .context(format!("could not get input file for date: '{year}-{day:02}'. Are you sure the session cookie is correctly set up ?"))?;
+        .context(format!("could not get input file for year: {year} and day: {day:02}. Are you sure the session cookie is correctly set up ?"))?;
+
+    debug!("request ok");
 
     fs::write(output, response.text().unwrap()).context("could not write input data to file")?;
 
-    println!("input data successfully retrieved and saved to '{output}'");
+    info!("input data successfully retrieved and saved to '{output}'");
     Ok(())
 }
 
 pub fn cmd_submit_answer(year: usize, day: usize, part: &Part, answer: &str) -> anyhow::Result<()> {
     let client = AocClient::new().context("could not build aoc client for future requests")?;
 
+    debug!("aoc client ok");
+
     let response = client
         .post_answer(year, day, part, answer)
         .context(format!(
-            "could not submit '{answer}' for date '{year}-{day:02}', part {part}"
+            "could not submit '{answer}' for year: {year} and day: {day:02} - part {part}"
         ))?
         .error_for_status()
         .context(format!(
-            "could not submit '{answer}' for date '{year}-{day:02}', part {part}. Are you sure the session cookie is correctly set up ?"
+            "could not submit '{answer}' for year: {year} and day: {day:02} - part {part}. Are you sure the session cookie is correctly set up ?"
         ))?;
+
+    debug!("request ok");
 
     let response_text = response.text()?;
 
     // Validate answer
     if response_text.contains("That's the right answer!") {
-        println!("Correct ! That's the right answer.");
+        info!("Correct ! That's the right answer.");
     } else {
-        println!("That is not the right answer...");
+        info!("That is not the right answer...");
     }
     Ok(())
 }
