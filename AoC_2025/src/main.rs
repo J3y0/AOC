@@ -6,17 +6,20 @@ use AoC_2025::{
 use clap::Parser;
 use std::{fs::read_to_string, process, time::Instant};
 
-fn run(day: usize, sol: impl Solution) {
+fn run<S>(day: usize)
+where
+    S: Solution,
+{
     let path = format!("input/{day:02}_day.txt");
     if let Ok(data) = read_to_string(&path) {
-        let input = sol.parse(&data);
+        let input = S::parse(&data);
 
         let now = Instant::now();
-        let part1 = sol.part1(&input);
+        let part1 = S::part1(&input);
         let elapsed_part1 = now.elapsed();
 
         let now = Instant::now();
-        let part2 = sol.part2(&input);
+        let part2 = S::part2(&input);
         let elapsed_part2 = now.elapsed();
 
         println!("{YELLOW}------------{RESET}");
@@ -37,13 +40,13 @@ fn run(day: usize, sol: impl Solution) {
 fn main() {
     let cli = cli::Cli::parse();
 
-    let sol = match cli.day {
-        1 => days::day01::Day01,
+    match cli.day {
+        1 => run::<days::Day01>(cli.day),
+        2 => run::<days::Day02>(cli.day),
+        3 => run::<days::Day03>(cli.day),
         _ => {
             eprintln!("Day {:02} is not implemented yet!", cli.day);
             process::exit(1);
         }
     };
-
-    run(cli.day, sol);
 }
