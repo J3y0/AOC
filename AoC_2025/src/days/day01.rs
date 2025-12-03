@@ -5,7 +5,7 @@ pub struct Day01;
 impl Solution for Day01 {
     type Input = Vec<i16>;
 
-    fn parse(&self, data: &str) -> Self::Input {
+    fn parse(data: &str) -> Self::Input {
         data.lines()
             .map(|line| {
                 let dir = line.chars().nth(0).unwrap();
@@ -15,7 +15,7 @@ impl Solution for Day01 {
             .collect()
     }
 
-    fn part1(&self, input: &Self::Input) -> usize {
+    fn part1(input: &Self::Input) -> usize {
         // Start at position 50
         let mut cur = 50;
         let mut passwd = 0;
@@ -29,7 +29,7 @@ impl Solution for Day01 {
         passwd
     }
 
-    fn part2(&self, input: &Self::Input) -> usize {
+    fn part2(input: &Self::Input) -> usize {
         // Start at position 50
         let mut cur = 50;
         let mut passwd = 0;
@@ -54,8 +54,7 @@ mod tests {
     use super::*;
 
     fn example_data() -> Vec<i16> {
-        let sol = Day01 {};
-        sol.parse(
+        Day01::parse(
             r#"L68
 L30
 R48
@@ -71,13 +70,11 @@ L82"#,
 
     #[test]
     fn part1_test() {
-        let sol = Day01 {};
-        assert_eq!(sol.part1(&example_data()), 3);
+        assert_eq!(Day01::part1(&example_data()), 3);
     }
 
     #[test]
     fn part2_test() {
-        let sol = Day01 {};
-        assert_eq!(sol.part2(&example_data()), 6);
+        assert_eq!(Day01::part2(&example_data()), 6);
     }
 }
