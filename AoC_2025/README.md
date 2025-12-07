@@ -8,3 +8,4 @@ As with previous years, you’ll find quick access to the 2025 solutions below:
 - [day 4](./src/days/day04.rs)
 - [day 5](./src/days/day05.rs)
 - [day 6](./src/days/day06.rs)
+- [day 7](./src/days/day07.rs)
