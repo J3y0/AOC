@@ -51,7 +51,7 @@ impl DSU {
         }
     }
 
-    fn union(&mut self, i1: usize, i2: usize) {
+    fn union(&mut self, i1: usize, i2: usize) -> u32 {
         let r1 = self.find_root(i1);
         let r2 = self.find_root(i2);
         if r1 != r2 {
@@ -61,11 +61,8 @@ impl DSU {
             self.parents[r2] = r1;
             self.sizes[r1] += self.sizes[r2];
         }
-    }
 
-    fn is_one_set(&self) -> bool {
-        let max_size = self.sizes.iter().max().unwrap_or(&0);
-        *max_size == self.sizes.len() as u32
+        self.sizes[r1]
     }
 }
 
@@ -94,7 +91,7 @@ impl Solution for Day08 {
                 distances.push((dist, i, j));
             }
         }
-        distances.sort_unstable();
+        distances.sort_unstable_by(|(d1, _, _), (d2, _, _)| d1.cmp(d2));
 
         Boxes {
             positions,
@@ -116,10 +113,8 @@ impl Solution for Day08 {
 
         loop {
             let (_, i1, i2) = input.distances[i];
-            dsu.union(i1, i2);
 
-            // Don't check for max if all positions are not added at least one
-            if i > input.positions.len() && dsu.is_one_set() {
+            if input.positions.len() == dsu.union(i1, i2) as usize {
                 res = input.positions[i1].x * input.positions[i2].x;
                 break;
             }
