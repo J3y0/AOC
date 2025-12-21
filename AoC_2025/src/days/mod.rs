@@ -6,6 +6,7 @@ mod day05;
 mod day06;
 mod day07;
 mod day08;
+mod day09;
 
 pub use day01::Day01;
 pub use day02::Day02;
@@ -15,6 +16,7 @@ pub use day05::Day05;
 pub use day06::Day06;
 pub use day07::Day07;
 pub use day08::Day08;
+pub use day09::Day09;
 
 pub trait Solution {
     type Input;
