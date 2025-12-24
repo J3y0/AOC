@@ -50,6 +50,7 @@ fn main() {
         7 => run::<days::Day07>(cli.day),
         8 => run::<days::Day08>(cli.day),
         9 => run::<days::Day09>(cli.day),
+        10 => run::<days::Day10>(cli.day),
         11 => run::<days::Day11>(cli.day),
         _ => {
             eprintln!("Day {:02} is not implemented yet!", cli.day);
