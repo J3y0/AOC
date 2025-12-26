@@ -1,4 +1,4 @@
-use std::{collections::HashMap, u16};
+use std::collections::HashMap;
 
 use crate::days::Solution;
 
@@ -7,7 +7,7 @@ pub struct Day10;
 #[derive(Debug)]
 pub struct Machine {
     lights: u32,
-    buttons: Vec<Vec<u8>>,
+    buttons: Vec<u32>,
     joltages: Vec<u16>,
 }
 
@@ -24,13 +24,18 @@ impl Solution for Day10 {
                     let inner = &elt[1..elt.len() - 1];
                     match elt.chars().next().unwrap() {
                         '[' => {
+                            // encode lights
                             lights = inner.chars().enumerate().fold(0, |acc, (i, c)| {
                                 let add = if c == '#' { 1 << i } else { 0 };
                                 acc + add
                             });
                         }
                         '(' => {
-                            buttons.push(inner.split(',').map(|i| i.parse().unwrap()).collect());
+                            let but: Vec<u8> =
+                                inner.split(',').map(|i| i.parse().unwrap()).collect();
+                            // encode buttons as bitvec (integer)
+                            let bin_buttons = but.iter().fold(0, |acc, e| acc + (1 << e));
+                            buttons.push(bin_buttons);
                         }
                         '{' => {
                             joltages = inner.split(',').map(|i| i.parse().unwrap()).collect();
@@ -47,18 +52,21 @@ impl Solution for Day10 {
             })
             .collect()
     }
+
     fn part1(input: &Self::Input) -> usize {
         input.iter().map(min_presses).sum()
     }
 
     fn part2(input: &Self::Input) -> usize {
-        let mut tot = 0;
-        for f in input {
-            let mut cache: HashMap<Vec<u16>, Option<usize>> = HashMap::new();
-            tot += recurse(&f.buttons, &f.joltages, &mut cache).unwrap();
-        }
+        input
+            .iter()
+            .map(|m| {
+                let mut cache = HashMap::new();
+                let combinations = precompute_combinations(&m.buttons);
 
-        tot
+                recurse(&combinations, &m.joltages, &mut cache).unwrap()
+            })
+            .sum()
     }
 }
 
@@ -66,9 +74,7 @@ fn min_presses(machine: &Machine) -> usize {
     for i in 1..machine.buttons.len() {
         let combi = Combination::new(machine.buttons.clone(), i);
         for c in combi {
-            let bin_buttons = get_binary_buttons(&c);
-
-            let res = bin_buttons.iter().fold(0, |acc, b| acc ^ b);
+            let res = c.iter().fold(0, |acc, b| acc ^ b);
             if res == machine.lights {
                 // Return directly as it is sure to be the lowest solution
                 return c.len();
@@ -80,16 +86,24 @@ fn min_presses(machine: &Machine) -> usize {
     unreachable!()
 }
 
-fn get_binary_buttons(buttons: &[Vec<u8>]) -> Vec<u32> {
-    buttons
-        .iter()
-        .map(|b| b.iter().fold(0, |acc, e| acc + (1 << e)))
-        .collect()
+fn precompute_combinations(bin_buttons: &[u32]) -> HashMap<u32, Vec<(Vec<u32>, usize)>> {
+    let mut map: HashMap<u32, Vec<(Vec<u32>, usize)>> = HashMap::new();
+
+    // should start from 0 to handle cases where all joltages are already even
+    for n in 0..=bin_buttons.len() {
+        let combi = Combination::new(bin_buttons.to_vec(), n);
+        for c in combi {
+            let pattern = c.iter().fold(0u32, |acc, &b| acc ^ b);
+            map.entry(pattern).or_default().push((c, n));
+        }
+    }
+
+    map
 }
 
 // https://www.reddit.com/r/adventofcode/comments/1pk87hl/2025_day_10_part_2_bifurcate_your_way_to_victory/
 fn recurse(
-    buttons: &Vec<Vec<u8>>,
+    combinations: &HashMap<u32, Vec<(Vec<u32>, usize)>>,
     joltages: &Vec<u16>,
     cache: &mut HashMap<Vec<u16>, Option<usize>>,
 ) -> Option<usize> {
@@ -105,20 +119,18 @@ fn recurse(
 
     let bin_joltages = get_binary_joltages(&joltages);
     let mut min_presses = None;
-    // should start from 0 to handle cases where all joltages are already even
-    for i in 0..=buttons.len() {
-        let combi = Combination::new(buttons.clone(), i);
-        for c in combi {
-            let bin_buttons = get_binary_buttons(&c);
-            let res_combi = bin_buttons.iter().fold(0, |acc, b| acc ^ b);
-            if res_combi == bin_joltages {
-                // go to next iteration if the combination exceeds any joltage value
-                let new_joltages = match get_next_joltages(&joltages, &bin_buttons) {
-                    Some(nj) => nj,
-                    None => continue,
-                };
-                let rec_presses = recurse(buttons, &new_joltages, cache).map(|v| c.len() + 2 * v);
-                min_presses = min_presses.min(rec_presses).or(min_presses).or(rec_presses);
+    if let Some(combs) = combinations.get(&bin_joltages) {
+        for (c, cur_pressed) in combs {
+            let new_joltages = match get_next_joltages(&joltages, &c) {
+                Some(nj) => nj,
+                None => continue,
+            };
+
+            if let Some(rec_presses) =
+                recurse(combinations, &new_joltages, cache).map(|v| cur_pressed + 2 * v)
+            {
+                min_presses =
+                    Some(min_presses.map_or(rec_presses, |best: usize| best.min(rec_presses)));
             }
         }
     }
@@ -239,28 +251,4 @@ mod tests {
     fn part2_test() {
         assert_eq!(Day10::part2(&example_data()), 33);
     }
-
-    // #[test]
-    // fn debug_recurse() {
-    //     assert_eq!(
-    //         recurse(&vec![vec![0, 1], vec![0, 2], vec![1, 2]], &vec![2, 2, 2]),
-    //         Some(3)
-    //     )
-    // }
-
-    // #[test]
-    // fn debug_recurse_double() {
-    //     assert_eq!(
-    //         recurse(&vec![vec![0, 1], vec![0, 2], vec![1, 2]], &vec![4, 4, 4]),
-    //         Some(6)
-    //     )
-    // }
-
-    // #[test]
-    // fn debug_recurse_double_add() {
-    //     assert_eq!(
-    //         recurse(&vec![vec![0, 1], vec![0, 2], vec![1, 2]], &vec![5, 5, 4]),
-    //         Some(7)
-    //     )
-    // }
 }
