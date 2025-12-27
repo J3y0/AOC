@@ -9,7 +9,7 @@ impl Solution for Day01 {
         data.lines()
             .map(|line| {
                 let dir = line.chars().nth(0).unwrap();
-                let parsed = (&line[1..]).parse::<i16>().unwrap();
+                let parsed = line[1..].parse::<i16>().unwrap();
                 if dir == 'L' { -parsed } else { parsed }
             })
             .collect()

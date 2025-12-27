@@ -30,12 +30,12 @@ impl From<&str> for Pos {
 // Disjoint Set Union with rank optimisation
 // reason with indexes of Pos
 #[derive(Debug)]
-struct DSU {
+struct Dsu {
     parents: Vec<usize>,
     sizes: Vec<u32>,
 }
 
-impl DSU {
+impl Dsu {
     fn new(n: usize) -> Self {
         Self {
             parents: (0..n).collect(),
@@ -75,7 +75,7 @@ impl Solution for Day08 {
     type Input = Boxes;
 
     fn parse(data: &str) -> Self::Input {
-        let positions: Vec<Pos> = data.lines().map(|l| Pos::from(l)).collect();
+        let positions: Vec<Pos> = data.lines().map(Pos::from).collect();
 
         // Precompute all distances:
         //   - distance first to sort the elements based on it
@@ -100,35 +100,31 @@ impl Solution for Day08 {
     }
 
     fn part1(input: &Self::Input) -> usize {
-        let mut sizes = run_dsu(&input, 1000);
+        let mut sizes = run_dsu(input, 1000);
         sizes.sort_unstable();
 
         sizes.iter().rev().take(3).product::<u32>() as usize
     }
 
     fn part2(input: &Self::Input) -> usize {
-        let mut dsu = DSU::new(input.positions.len());
+        let mut dsu = Dsu::new(input.positions.len());
         let mut i = 0;
-        let mut res = 0;
 
         loop {
             let (_, i1, i2) = input.distances[i];
 
             if input.positions.len() == dsu.union(i1, i2) as usize {
-                res = input.positions[i1].x * input.positions[i2].x;
-                break;
+                break input.positions[i1].x * input.positions[i2].x;
             }
 
             i += 1;
         }
-
-        res
     }
 }
 
 // Inner part 1 for testing (number of steps differs)
 fn run_dsu(boxes: &Boxes, steps: usize) -> Vec<u32> {
-    let mut dsu = DSU::new(boxes.positions.len());
+    let mut dsu = Dsu::new(boxes.positions.len());
     for k in 0..steps {
         let (_, i1, i2) = boxes.distances[k];
         dsu.union(i1, i2);

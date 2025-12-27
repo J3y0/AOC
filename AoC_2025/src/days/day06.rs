@@ -44,11 +44,11 @@ impl Solution for Day06 {
         let symbols: Vec<Operator> = symbols
             .split_ascii_whitespace()
             .filter(|s| !s.is_empty())
-            .map(|s| Operator::from(s))
+            .map(Operator::from)
             .collect();
 
         Calculation {
-            lines: lines.rev().map(|l| String::from(l)).collect(),
+            lines: lines.rev().map(String::from).collect(),
             symbols,
         }
     }
@@ -73,10 +73,10 @@ impl Solution for Day06 {
             let symbol = &input.symbols[c];
             let mut res = symbol.get_init_val();
             // Compute for the entire column
-            for r in 0..numbers.len() {
+            for nb in &numbers {
                 match symbol {
-                    Operator::Add => res += numbers[r][c],
-                    Operator::Mul => res *= numbers[r][c],
+                    Operator::Add => res += nb[c],
+                    Operator::Mul => res *= nb[c],
                     Operator::Undefined => {}
                 }
             }
@@ -103,10 +103,8 @@ impl Solution for Day06 {
             for r in 0..input.lines.len() {
                 // Pad if whitespace has been stripped
                 let n = input.lines[r].as_bytes().get(c).unwrap_or(&b' ');
-                match n {
-                    // is a number
-                    b'0'..=b'9' => col_nb = col_nb * 10 + (n - b'0') as usize,
-                    _ => {}
+                if let b'0'..=b'9' = n {
+                    col_nb = col_nb * 10 + (n - b'0') as usize;
                 }
             }
             // numbers for one operation are separated by 0 (column with whitespaces only)

@@ -60,11 +60,11 @@ impl Solution for Day12 {
                                 .map(|i| i.parse().unwrap())
                                 .collect();
 
-                            return Region {
+                            Region {
                                 quantities: qty,
                                 width: col,
                                 height: row,
-                            };
+                            }
                         })
                         .collect();
                 }

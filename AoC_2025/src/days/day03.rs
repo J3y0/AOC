@@ -20,7 +20,7 @@ impl Solution for Day03 {
     fn part1(input: &Self::Input) -> usize {
         let mut tot = 0;
         for bank in input {
-            tot += max_jolt(&bank, 2);
+            tot += max_jolt(bank, 2);
         }
 
         tot
@@ -29,7 +29,7 @@ impl Solution for Day03 {
     fn part2(input: &Self::Input) -> usize {
         let mut tot = 0;
         for bank in input {
-            tot += max_jolt(&bank, 12);
+            tot += max_jolt(bank, 12);
         }
 
         tot
@@ -45,9 +45,9 @@ fn max_jolt(bank: &Bank, nb_bat: usize) -> usize {
         // enough numbers should remain to compose the result
         let end = n - i;
         let mut max = 0;
-        for j in pos..=end {
-            if bank[j] > max {
-                max = bank[j];
+        for (j, elt) in bank.iter().enumerate().take(end + 1).skip(pos) {
+            if *elt > max {
+                max = *elt;
                 pos = j + 1;
             }
         }
