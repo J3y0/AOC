@@ -52,6 +52,7 @@ fn main() {
         9 => run::<days::Day09>(cli.day),
         10 => run::<days::Day10>(cli.day),
         11 => run::<days::Day11>(cli.day),
+        12 => run::<days::Day12>(cli.day),
         _ => {
             eprintln!("Day {:02} is not implemented yet!", cli.day);
             process::exit(1);
