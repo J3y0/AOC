@@ -138,20 +138,20 @@ fn compressed_grid(
     for i in 0..points_len {
         let p1 = &points[i];
         let p2 = &points[(i + 1) % points_len];
-        let ((cx1, cy1), (cx2, cy2)) = compressed_coords(p1, p2, &xs, &ys);
-        for cx in cx1..=cx2 {
-            for cy in cy1..=cy2 {
-                cgrid[cx][cy] = 1;
+        let ((cx1, cy1), (cx2, cy2)) = compressed_coords(p1, p2, xs, ys);
+        for row in cgrid.iter_mut().take(cx2 + 1).skip(cx1) {
+            for elt in row.iter_mut().take(cy2 + 1).skip(cy1) {
+                *elt = 1;
             }
         }
     }
 
     // fill within polygon
-    for i in 0..cgrid.len() {
+    for row in &mut cgrid {
         let mut start = 0;
         let mut out = true;
-        for j in 0..cgrid[i].len() {
-            if cgrid[i][j] == 0 {
+        for j in 0..row.len() {
+            if row[j] == 0 {
                 continue;
             }
             if out {
@@ -159,8 +159,8 @@ fn compressed_grid(
                 out = false;
             } else {
                 out = true;
-                for k in start..j {
-                    cgrid[i][k] = 1;
+                for within in row.iter_mut().take(j).skip(start) {
+                    *within = 1;
                 }
             }
         }

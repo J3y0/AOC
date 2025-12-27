@@ -117,11 +117,11 @@ fn recurse(
         return Some(0);
     }
 
-    let bin_joltages = get_binary_joltages(&joltages);
+    let bin_joltages = get_binary_joltages(joltages);
     let mut min_presses = None;
     if let Some(combs) = combinations.get(&bin_joltages) {
         for (c, cur_pressed) in combs {
-            let new_joltages = match get_next_joltages(&joltages, &c) {
+            let new_joltages = match get_next_joltages(joltages, c) {
                 Some(nj) => nj,
                 None => continue,
             };

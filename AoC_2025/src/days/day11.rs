@@ -15,10 +15,7 @@ impl Solution for Day11 {
         let mut map = HashMap::new();
         for l in data.lines() {
             let (inp, outs) = l.split_once(":").unwrap();
-            let outs = outs
-                .split_ascii_whitespace()
-                .map(|s| String::from(s))
-                .collect();
+            let outs = outs.split_ascii_whitespace().map(String::from).collect();
 
             map.insert(String::from(inp), outs);
         }

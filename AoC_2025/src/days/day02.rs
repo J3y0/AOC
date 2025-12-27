@@ -69,10 +69,10 @@ impl Solution for Day02 {
                     // To account cases such as 9 - 23
                     for val in 0..=pat_end {
                         let repeated = concat(val, range.end.len() / nb_digit);
-                        if (range.start_parsed..=range.end_parsed).contains(&repeated) {
-                            if seen.insert(repeated) {
-                                tot += repeated
-                            }
+                        if (range.start_parsed..=range.end_parsed).contains(&repeated)
+                            && seen.insert(repeated)
+                        {
+                            tot += repeated
                         }
                     }
                     pat_end *= 10;
@@ -81,20 +81,20 @@ impl Solution for Day02 {
                 for val in pat..=pat_end {
                     // To account cases where nb_digits start != nb_digits end
                     let repeated = concat(val, range.end.len() / nb_digit);
-                    if (range.start_parsed..=range.end_parsed).contains(&repeated) {
-                        if seen.insert(repeated) {
-                            tot += repeated
-                        }
+                    if (range.start_parsed..=range.end_parsed).contains(&repeated)
+                        && seen.insert(repeated)
+                    {
+                        tot += repeated
                     }
 
                     if nb_digit == range.start.len() {
                         continue;
                     }
                     let repeated = concat(val, range.start.len() / nb_digit);
-                    if (range.start_parsed..=range.end_parsed).contains(&repeated) {
-                        if seen.insert(repeated) {
-                            tot += repeated
-                        }
+                    if (range.start_parsed..=range.end_parsed).contains(&repeated)
+                        && seen.insert(repeated)
+                    {
+                        tot += repeated
                     }
                 }
             }

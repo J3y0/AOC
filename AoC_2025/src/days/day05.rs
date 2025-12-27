@@ -68,7 +68,7 @@ impl Solution for Day05 {
     fn parse(data: &str) -> Self::Input {
         let (ranges, available) = data.split_once("\n\n").unwrap();
 
-        let fresh = ranges.lines().map(|l| Range::from(l)).collect();
+        let fresh = ranges.lines().map(Range::from).collect();
 
         let available = available
             .lines()
@@ -93,9 +93,7 @@ impl Solution for Day05 {
         rgs.sort_by(|a, b| a.start.cmp(&b.start));
 
         let mut merged_rgs = vec![rgs[0].clone()];
-        for i in 1..rgs.len() {
-            let rg = &rgs[i];
-
+        for rg in rgs.iter().skip(1) {
             let last = merged_rgs.len() - 1;
             match merged_rgs[last].merge(rg) {
                 Some(merged) => merged_rgs[last] = merged,
