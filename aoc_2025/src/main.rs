@@ -1,4 +1,4 @@
-use AoC_2025::{
+use aoc_2025::{
     ansi::{BOLD, RED, RESET, YELLOW},
     cli,
     days::{self, Solution},
