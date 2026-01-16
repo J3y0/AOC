@@ -1,9 +1,9 @@
 # Advent of Code 2024
 
-Same as before, you can find a quick access for 2024 solutions below:
-
 Each day implements an interface with method `Part1()`, `Part2()` and `Parse()`.
 The interface is defined in `./days/solution.go`
+
+As with previous years, you’ll find quick access to the 2024 solutions below:
 
 - [Day 1](./days/01_day.go)
 - [Day 2](./days/02_day.go)
@@ -30,4 +30,3 @@ The interface is defined in `./days/solution.go`
 - [Day 23](./days/23_day.go)
 - [Day 24](./days/24_day.go)
 - [Day 25](./days/25_day.go)
-
