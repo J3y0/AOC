@@ -6,29 +6,20 @@ import (
 )
 
 type Day2 struct {
-	Instructions []string
+	instructions []string
+}
+
+func (d *Day2) Parse(input string) error {
+	d.instructions = utils.ParseLines(input)
+	return nil
 }
 
 func (d *Day2) Part1() (int, error) {
-	instructions, err := utils.ParseLines("./input/02_day.txt")
-	if err != nil {
-		return 0, err
-	}
-	d.Instructions = instructions
-
-	return ComputeFinalPositionPart1(d.Instructions)
+	return ComputeFinalPositionPart1(d.instructions)
 }
 
 func (d *Day2) Part2() (int, error) {
-	if len(d.Instructions) == 0 {
-		instructions, err := utils.ParseLines("./input/02_day.txt")
-		if err != nil {
-			return 0, err
-		}
-		d.Instructions = instructions
-	}
-
-	return ComputeFinalPositionPart2(d.Instructions)
+	return ComputeFinalPositionPart2(d.instructions)
 }
 
 func ComputeFinalPositionPart1(lines []string) (int, error) {

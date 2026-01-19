@@ -3,7 +3,6 @@ package days
 import (
 	"main/utils"
 	"math"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -14,29 +13,42 @@ type Day7 struct {
 	maxX  int
 }
 
-func (d *Day7) Part1() (int, error) {
-	crabs, minX, maxX, err := parseCrabs("./input/07_day.txt")
-	if err != nil {
-		return 0, err
+func (d *Day7) Parse(input string) error {
+	input = strings.Trim(input, "\n")
+	crabs := strings.Split(input, ",")
+
+	parsedCrabs := make([]int, len(crabs))
+	for i, crab := range crabs {
+		crabInt, err := strconv.Atoi(crab)
+		if err != nil {
+			return err
+		}
+
+		parsedCrabs[i] = crabInt
 	}
-	d.crabs = crabs
+
+	// Find min and max crab's horizontal pos
+	minX := parsedCrabs[0]
+	maxX := parsedCrabs[0]
+	for _, crab := range parsedCrabs {
+		if crab > maxX {
+			maxX = crab
+		} else if crab < minX {
+			minX = crab
+		}
+	}
 	d.minX = minX
 	d.maxX = maxX
+	d.crabs = parsedCrabs
 
+	return nil
+}
+
+func (d *Day7) Part1() (int, error) {
 	return minFuel(d.crabs, d.minX, d.maxX, true), nil
 }
 
 func (d *Day7) Part2() (int, error) {
-	if len(d.crabs) == 0 {
-		crabs, minX, maxX, err := parseCrabs("./input/07_day.txt")
-		if err != nil {
-			return 0, err
-		}
-		d.crabs = crabs
-		d.minX = minX
-		d.maxX = maxX
-	}
-
 	return minFuel(d.crabs, d.minX, d.maxX, false), nil
 }
 
@@ -59,36 +71,4 @@ func minFuel(crabs []int, minX, maxX int, part1 bool) int {
 		}
 	}
 	return minFuel
-}
-
-func parseCrabs(path string) ([]int, int, int, error) {
-	content, err := os.ReadFile(path)
-	if err != nil {
-		return nil, 0, 0, err
-	}
-
-	crabs := strings.Split(string(content), ",")
-
-	parsedCrabs := make([]int, len(crabs))
-	for i, crab := range crabs {
-		crabInt, err := strconv.Atoi(crab)
-		if err != nil {
-			return nil, 0, 0, err
-		}
-
-		parsedCrabs[i] = crabInt
-	}
-
-	// Find min and max crab's horizontal pos
-	minX := parsedCrabs[0]
-	maxX := parsedCrabs[0]
-	for _, crab := range parsedCrabs {
-		if crab > maxX {
-			maxX = crab
-		} else if crab < minX {
-			minX = crab
-		}
-	}
-
-	return parsedCrabs, minX, maxX, nil
 }

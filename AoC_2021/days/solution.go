@@ -1,24 +1,26 @@
 package days
 
 import (
-	"main/utils"
+	"fmt"
+	"os"
 	"time"
 )
 
-type NotInRangeError struct {
+type NotImplemented struct {
 	message string
 }
 
-func (e *NotInRangeError) Error() string {
+func (e *NotImplemented) Error() string {
 	return e.message
 }
 
 type Solution interface {
+	Parse(string) error
 	Part1() (int, error)
 	Part2() (int, error)
 }
 
-func RunSelectedSolution(day, part int) error {
+func RunSolution(day int) error {
 	var solutionToRun Solution
 	switch day {
 	case 1:
@@ -34,48 +36,41 @@ func RunSelectedSolution(day, part int) error {
 	case 7:
 		solutionToRun = &Day7{}
 	default:
-		return &NotInRangeError{message: "day should be between 1 and 25"}
+		return &NotImplemented{message: "day not implemented yet\n"}
+	}
+
+	filename := fmt.Sprintf("./input/%02d_day.txt", day)
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+
+	if err = solutionToRun.Parse(string(content)); err != nil {
+		return err
 	}
 
 	var (
 		part1, part2 int
 		time1, time2 time.Duration
-		err          error
 	)
-	switch part {
-	case 0:
-		start := time.Now()
-		part1, err = solutionToRun.Part1()
-		if err != nil {
-			return err
-		}
-		time1 = time.Since(start)
-
-		start = time.Now()
-		part2, err = solutionToRun.Part2()
-		if err != nil {
-			return err
-		}
-		time2 = time.Since(start)
-	case 1:
-		start := time.Now()
-		part1, err = solutionToRun.Part1()
-		if err != nil {
-			return err
-		}
-		time1 = time.Since(start)
-	case 2:
-		start := time.Now()
-		part2, err = solutionToRun.Part2()
-		if err != nil {
-			return err
-		}
-		time2 = time.Since(start)
-	default:
-		return &NotInRangeError{message: "part should be between 0 and 2"}
+	start := time.Now()
+	part1, err = solutionToRun.Part1()
+	if err != nil {
+		return err
 	}
+	time1 = time.Since(start)
 
-	utils.FormatAndPrintResult(day, part1, part2, time1, time2)
+	start = time.Now()
+	part2, err = solutionToRun.Part2()
+	if err != nil {
+		return err
+	}
+	time2 = time.Since(start)
+
+	fmt.Printf("|------------ Day %02d ------------|\n", day)
+	fmt.Printf("| Part 1: %d in %d ns\n", part1, time1.Nanoseconds())
+	fmt.Printf("| Part 2: %d in %d ns\n", part2, time2.Nanoseconds())
+	fmt.Println("|--------------------------------|")
 
 	return nil
 }

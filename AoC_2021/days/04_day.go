@@ -3,7 +3,6 @@ package days
 import (
 	"fmt"
 	"main/utils"
-	"os"
 	"strings"
 )
 
@@ -24,28 +23,53 @@ type Day4 struct {
 	bingoList []BingoGrid
 }
 
-func (d *Day4) Part1() (int, error) {
-	bingoList, numbers, err := parseBingo("./input/04_day.txt")
-	if err != nil {
-		return 0, err
-	}
-	d.bingoList = bingoList
+func (d *Day4) Parse(input string) error {
+	var (
+		numbers   []int
+		bingoList []BingoGrid
+	)
 
-	part1, numbersLeft := drawNumbersUntilFirst(bingoList, numbers)
+	input = strings.Trim(input, "\n")
+	content := strings.Split(input, "\n\n")
+	numbers, err := utils.ParseLineToIntArray(content[0], ",")
+	if err != nil {
+		return err
+	}
+
+	for i := 1; i < len(content); i++ {
+		bingoGrid := BingoGrid{won: false}
+
+		var gridNumbersLine [BINGOSIZE]int
+		for j, line := range strings.Split(content[i], "\n") {
+			_, err := fmt.Sscanf(line, "%d %d %d %d %d", &gridNumbersLine[0], &gridNumbersLine[1], &gridNumbersLine[2], &gridNumbersLine[3], &gridNumbersLine[4])
+			if err != nil {
+				return err
+			}
+
+			tilesLine := [BINGOSIZE]BingoTile{}
+			for k, number := range gridNumbersLine {
+				tilesLine[k].number = number
+				tilesLine[k].drawn = false
+			}
+
+			bingoGrid.grid[j] = tilesLine
+		}
+		bingoList = append(bingoList, bingoGrid)
+	}
+
+	d.bingoList = bingoList
+	d.numbers = numbers
+
+	return nil
+}
+
+func (d *Day4) Part1() (int, error) {
+	part1, numbersLeft := drawNumbersUntilFirst(d.bingoList, d.numbers)
 	d.numbers = numbersLeft
 	return part1, nil
 }
 
 func (d *Day4) Part2() (int, error) {
-	if len(d.bingoList) == 0 {
-		bingoList, numbers, err := parseBingo("./input/04_day.txt")
-		if err != nil {
-			return 0, err
-		}
-		d.bingoList = bingoList
-		d.numbers = numbers
-	}
-
 	return drawNumbersUntilLast(d.bingoList, d.numbers), nil
 }
 
@@ -64,8 +88,8 @@ OuterLoop:
 			if bingo.won {
 				continue
 			}
-			for i := 0; i < BINGOSIZE; i++ {
-				for j := 0; j < BINGOSIZE; j++ {
+			for i := range BINGOSIZE {
+				for j := range BINGOSIZE {
 					if bingo.grid[i][j].number == number {
 						bingo.grid[i][j].drawn = true
 					}
@@ -97,8 +121,8 @@ OuterLoop:
 		number := numbers[0]
 		numbers = numbers[1:]
 		for k, bingo := range bingoList {
-			for i := 0; i < BINGOSIZE; i++ {
-				for j := 0; j < BINGOSIZE; j++ {
+			for i := range BINGOSIZE {
+				for j := range BINGOSIZE {
 					if bingo.grid[i][j].number == number {
 						bingo.grid[i][j].drawn = true
 					}
@@ -123,8 +147,8 @@ OuterLoop:
 
 func computeFinalScore(winnerGrid BingoGrid, winningNumber int) int {
 	var total int
-	for i := 0; i < BINGOSIZE; i++ {
-		for j := 0; j < BINGOSIZE; j++ {
+	for i := range BINGOSIZE {
+		for j := range BINGOSIZE {
 			if !winnerGrid.grid[i][j].drawn {
 				total += winnerGrid.grid[i][j].number
 			}
@@ -135,9 +159,9 @@ func computeFinalScore(winnerGrid BingoGrid, winningNumber int) int {
 }
 
 func hasColCompleted(bingoGrid BingoGrid) bool {
-	for i := 0; i < BINGOSIZE; i++ {
+	for i := range BINGOSIZE {
 		completed := true
-		for j := 0; j < BINGOSIZE; j++ {
+		for j := range BINGOSIZE {
 			if !bingoGrid.grid[j][i].drawn {
 				completed = false
 				break
@@ -152,9 +176,9 @@ func hasColCompleted(bingoGrid BingoGrid) bool {
 }
 
 func hasLineCompleted(bingoGrid BingoGrid) bool {
-	for i := 0; i < BINGOSIZE; i++ {
+	for i := range BINGOSIZE {
 		completed := true
-		for j := 0; j < BINGOSIZE; j++ {
+		for j := range BINGOSIZE {
 			if !bingoGrid.grid[i][j].drawn {
 				completed = false
 				break
@@ -166,41 +190,4 @@ func hasLineCompleted(bingoGrid BingoGrid) bool {
 		}
 	}
 	return false
-}
-
-func parseBingo(path string) (bingoList []BingoGrid, numbers []int, err error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	content := strings.Split(strings.ReplaceAll(string(data), "\r\n", "\n"), "\n\n")
-
-	numbers, err = utils.ParseLineToIntArray(content[0], ",")
-	if err != nil {
-		return nil, nil, err
-	}
-
-	for i := 1; i < len(content); i++ {
-		bingoGrid := BingoGrid{won: false}
-
-		var gridNumbersLine [BINGOSIZE]int
-		for j, line := range strings.Split(content[i], "\n") {
-			_, err := fmt.Sscanf(line, "%d %d %d %d %d", &gridNumbersLine[0], &gridNumbersLine[1], &gridNumbersLine[2], &gridNumbersLine[3], &gridNumbersLine[4])
-			if err != nil {
-				return nil, nil, err
-			}
-
-			tilesLine := [BINGOSIZE]BingoTile{}
-			for k, number := range gridNumbersLine {
-				tilesLine[k].number = number
-				tilesLine[k].drawn = false
-			}
-
-			bingoGrid.grid[j] = tilesLine
-		}
-		bingoList = append(bingoList, bingoGrid)
-	}
-
-	return
 }
