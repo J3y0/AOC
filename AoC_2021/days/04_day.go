@@ -64,9 +64,7 @@ func (d *Day4) Parse(input string) error {
 }
 
 func (d *Day4) Part1() (int, error) {
-	part1, numbersLeft := drawNumbersUntilFirst(d.bingoList, d.numbers)
-	d.numbers = numbersLeft
-	return part1, nil
+	return drawNumbersUntilFirst(d.bingoList, d.numbers), nil
 }
 
 func (d *Day4) Part2() (int, error) {
@@ -75,11 +73,11 @@ func (d *Day4) Part2() (int, error) {
 
 func drawNumbersUntilLast(bingoList []BingoGrid, numbers []int) int {
 	var (
-		winningNumber int
-		lastGrid      BingoGrid
-		totalGrid     = len(bingoList)
+		nbWinningGrids int
+		winningNumber  int
+		lastGrid       BingoGrid
+		totalGrid      = len(bingoList)
 	)
-	nbWinningGrids := 1
 OuterLoop:
 	for len(numbers) > 0 {
 		number := numbers[0]
@@ -111,16 +109,19 @@ OuterLoop:
 	return computeFinalScore(lastGrid, winningNumber)
 }
 
-func drawNumbersUntilFirst(bingoList []BingoGrid, numbers []int) (int, []int) {
+func drawNumbersUntilFirst(bingoList []BingoGrid, numbers []int) int {
 	var (
 		winnerGrid    BingoGrid
 		winningNumber int
 	)
+	// Keep modifications local to first part
+	localBingoList := make([]BingoGrid, len(bingoList))
+	copy(localBingoList, bingoList)
 OuterLoop:
 	for len(numbers) > 0 {
 		number := numbers[0]
 		numbers = numbers[1:]
-		for k, bingo := range bingoList {
+		for k, bingo := range localBingoList {
 			for i := range BINGOSIZE {
 				for j := range BINGOSIZE {
 					if bingo.grid[i][j].number == number {
@@ -128,10 +129,10 @@ OuterLoop:
 					}
 				}
 			}
-			bingoList[k].grid = bingo.grid
+			localBingoList[k].grid = bingo.grid
 
 			if hasColCompleted(bingo) || hasLineCompleted(bingo) {
-				bingoList[k].won = true
+				localBingoList[k].won = true
 				winnerGrid = bingo
 				winningNumber = number
 				break OuterLoop
@@ -139,10 +140,7 @@ OuterLoop:
 		}
 	}
 
-	// Add again the number as we didn't go through all grids
-	numbers = append([]int{winningNumber}, numbers...)
-
-	return computeFinalScore(winnerGrid, winningNumber), numbers
+	return computeFinalScore(winnerGrid, winningNumber)
 }
 
 func computeFinalScore(winnerGrid BingoGrid, winningNumber int) int {
