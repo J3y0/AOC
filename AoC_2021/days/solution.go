@@ -31,6 +31,8 @@ func RunSolution(day int) error {
 		solutionToRun = &Day3{}
 	case 4:
 		solutionToRun = &Day4{}
+	case 5:
+		solutionToRun = &Day5{}
 	case 6:
 		solutionToRun = &Day6{}
 	case 7:
