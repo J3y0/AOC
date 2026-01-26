@@ -1,6 +1,7 @@
 package days
 
 import (
+	"main/utils"
 	"slices"
 	"strings"
 )
@@ -98,23 +99,16 @@ func getBasinSize(start [2]int, hmap [][]rune) int {
 		area += 1
 
 		// Add neighbors in the queue
-		i := p[0]
-		j := p[1]
-		neighbors := [4][2]int{
-			{i - 1, j},
-			{i + 1, j},
-			{i, j - 1},
-			{i, j + 1},
-		}
-
-		for _, n := range neighbors {
-			if n[0] < 0 || n[1] < 0 || n[0] >= len(hmap) || n[1] >= len(hmap[0]) {
+		for _, n := range utils.OrthogonalNeighbors {
+			ni := p[0] + n[0]
+			nj := p[1] + n[1]
+			if ni < 0 || nj < 0 || ni >= len(hmap) || nj >= len(hmap[0]) {
 				continue
 			}
-			if hmap[n[0]][n[1]] == '9' {
+			if hmap[ni][nj] == '9' {
 				continue
 			}
-			q = append(q, n)
+			q = append(q, [2]int{ni, nj})
 		}
 	}
 
