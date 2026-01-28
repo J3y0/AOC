@@ -45,6 +45,8 @@ func RunSolution(day int) error {
 		solutionToRun = &Day10{}
 	case 11:
 		solutionToRun = &Day11{}
+	case 12:
+		solutionToRun = &Day12{}
 	default:
 		return &NotImplemented{message: "day not implemented yet\n"}
 	}
