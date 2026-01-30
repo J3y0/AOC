@@ -29,7 +29,7 @@ func (d *Day4) Parse(input string) error {
 		bingoList []BingoGrid
 	)
 
-	input = strings.Trim(input, "\n")
+	input = strings.TrimSpace(input)
 	content := strings.Split(input, "\n\n")
 	numbers, err := utils.ParseLineToIntArray(content[0], ",")
 	if err != nil {

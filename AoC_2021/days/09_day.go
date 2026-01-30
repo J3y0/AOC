@@ -3,7 +3,6 @@ package days
 import (
 	"main/utils"
 	"slices"
-	"strings"
 )
 
 type Day9 struct {
@@ -11,8 +10,7 @@ type Day9 struct {
 }
 
 func (d *Day9) Parse(input string) error {
-	input = strings.Trim(input, "\n")
-	lines := strings.Split(input, "\n")
+	lines := utils.ParseLines(input)
 	d.heightmaps = make([][]rune, len(lines))
 	for i, l := range lines {
 		d.heightmaps[i] = []rune(l)

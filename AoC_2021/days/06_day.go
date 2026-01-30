@@ -11,7 +11,7 @@ type Day6 struct {
 }
 
 func (d *Day6) Parse(input string) error {
-	input = strings.Trim(input, "\n")
+	input = strings.TrimSpace(input)
 	fishes := strings.Split(input, ",")
 	parsedFishes := make([]int, nbChildReproduce+1)
 	for _, fish := range fishes {

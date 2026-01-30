@@ -6,7 +6,7 @@ import (
 )
 
 func ParseLines(input string) []string {
-	input = strings.Trim(input, " \n")
+	input = strings.TrimSpace(input)
 	return strings.Split(input, "\n")
 }
 

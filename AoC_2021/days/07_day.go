@@ -14,7 +14,7 @@ type Day7 struct {
 }
 
 func (d *Day7) Parse(input string) error {
-	input = strings.Trim(input, "\n")
+	input = strings.TrimSpace(input)
 	crabs := strings.Split(input, ",")
 
 	parsedCrabs := make([]int, len(crabs))
