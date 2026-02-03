@@ -12,3 +12,8 @@ func AbsInt(x int) int {
 	}
 	return x
 }
+
+// mod n would produce numbers between [[0; n-1]]. This function shifts this interval by 1 and produce numbers between [[1; n]]
+func ShiftedMod(x, n int) int {
+	return (x-1)%n + 1
+}
