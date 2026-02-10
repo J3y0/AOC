@@ -6,22 +6,14 @@ import (
 	"strings"
 )
 
-type Range struct {
-	start, end int
-}
-
-func (r *Range) Contains(v int) bool {
-	return r.start <= v && v <= r.end
-}
-
 type Day17 struct {
-	xr, yr Range
+	xr, yr utils.Range
 }
 
 func (d *Day17) Parse(input string) error {
 	input = strings.TrimSpace(input)
-	var xr, yr Range
-	_, err := fmt.Sscanf(input, "target area: x=%d..%d, y=%d..%d", &xr.start, &xr.end, &yr.start, &yr.end)
+	var xr, yr utils.Range
+	_, err := fmt.Sscanf(input, "target area: x=%d..%d, y=%d..%d", &xr.Start, &xr.End, &yr.Start, &yr.End)
 	d.xr = xr
 	d.yr = yr
 	return err
@@ -43,14 +35,14 @@ func (d *Day17) Parse(input string) error {
  * Finally, we note yb the lowest bound and get ymax for vy_start=|yb+1|
  */
 func (d *Day17) Part1() (int, error) {
-	vy_start := utils.AbsInt(d.yr.start + 1)
+	vy_start := utils.AbsInt(d.yr.Start + 1)
 	return (vy_start * (vy_start + 1)) / 2, nil
 }
 
 func (d *Day17) Part2() (int, error) {
-	yrange := max(utils.AbsInt(d.yr.start), utils.AbsInt(d.yr.end))
+	yrange := max(utils.AbsInt(d.yr.Start), utils.AbsInt(d.yr.End))
 	count := 0
-	for vx := 1; vx <= d.xr.end; vx++ {
+	for vx := 1; vx <= d.xr.End; vx++ {
 		for vy := -yrange; vy <= yrange; vy++ {
 			if valid(d.xr, d.yr, vx, vy, yrange) {
 				count += 1
@@ -60,7 +52,7 @@ func (d *Day17) Part2() (int, error) {
 	return count, nil
 }
 
-func valid(xr, yr Range, vx, vy, r int) bool {
+func valid(xr, yr utils.Range, vx, vy, r int) bool {
 	x := vx
 	y := vy
 	for i := 1; i <= 2*r; i++ {
@@ -75,6 +67,6 @@ func valid(xr, yr Range, vx, vy, r int) bool {
 	return false
 }
 
-func inTarget(xr, yr Range, x, y int) bool {
+func inTarget(xr, yr utils.Range, x, y int) bool {
 	return xr.Contains(x) && yr.Contains(y)
 }
