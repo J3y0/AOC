@@ -17,3 +17,11 @@ func AbsInt(x int) int {
 func ShiftedMod(x, n int) int {
 	return (x-1)%n + 1
 }
+
+func Mod(x, n int) int {
+	rem := x % n
+	if rem < 0 {
+		return rem + n
+	}
+	return rem
+}
