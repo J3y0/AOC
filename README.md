@@ -1,3 +1,7 @@
+# Advent of Code 2021
+
+You can find the quick access for year 2021 by following this link: [AoC 2021](./AoC_2021/README.md)
+
 # Advent of Code 2022
 
 I might write solutions in different languages but most of them will be in rust or golang.

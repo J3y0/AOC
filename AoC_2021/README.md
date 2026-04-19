@@ -1,0 +1,27 @@
+# Advent of Code 2021
+
+As with previous years, you’ll find quick access to the 2021 solutions below:
+
+- [day 1](./days/01_day.go)
+- [day 2](./days/02_day.go)
+- [day 3](./days/03_day.go)
+- [day 4](./days/04_day.go)
+- [day 5](./days/05_day.go)
+- [day 6](./days/06_day.go)
+- [day 7](./days/07_day.go)
+- [day 8](./days/08_day.go)
+- [day 9](./days/09_day.go)
+- [day 10](./days/10_day.go)
+- [day 11](./days/11_day.go)
+- [day 12](./days/12_day.go)
+- [day 13](./days/13_day.go)
+- [day 14](./days/14_day.go)
+- [day 15](./days/15_day.go)
+- [day 16](./days/16_day.go)
+- [day 17](./days/17_day.go)
+- [day 18](./days/18_day.go)
+- [day 20](./days/20_day.go)
+- [day 21](./days/21_day.go)
+- [day 22](./days/22_day.go)
+- [day 24](./days/24_day.go)
+- [day 25](./days/25_day.go)
