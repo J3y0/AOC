@@ -67,11 +67,8 @@ func polymerStep(step int, start string, insertions map[string]byte) int {
 	mini := math.MaxInt
 	maxi := 0
 	for _, v := range letterMap {
-		if v < mini {
-			mini = v
-		} else if v > maxi {
-			maxi = v
-		}
+		mini = min(mini, v)
+		maxi = max(maxi, v)
 	}
 
 	return maxi - mini
