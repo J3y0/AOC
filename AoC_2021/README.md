@@ -20,6 +20,7 @@ As with previous years, you’ll find quick access to the 2021 solutions below:
 - [day 16](./days/16_day.go)
 - [day 17](./days/17_day.go)
 - [day 18](./days/18_day.go)
+- [day 19](./days/19_day.go)
 - [day 20](./days/20_day.go)
 - [day 21](./days/21_day.go)
 - [day 22](./days/22_day.go)
