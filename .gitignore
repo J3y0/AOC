@@ -1,3 +1,2 @@
-*/*_day/data/
-*/*_day/.idea/
-*/data/
+**/*_day.txt
+**/.idea/
